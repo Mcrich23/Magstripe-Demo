@@ -56,19 +56,19 @@ test('hands-free lifecycle: successive swipes, focus recovery, and automatic cle
   doc.focused = true; win.dispatchEvent(new Event('focus'));
   assert.equal(node('status').textContent, 'Ready for a swipe');
   type(samples.payment); finish(); assert.equal(number(), '•••• 4242');
-  assert.equal(node('countdown').textContent, 'Swipe clears in 15 seconds.');
+  assert.equal(node('countdown').textContent, 'Swipe clears in 30 seconds.');
   now += 1000; tick();
-  assert.equal(node('countdown').textContent, 'Swipe clears in 14 seconds.');
+  assert.equal(node('countdown').textContent, 'Swipe clears in 29 seconds.');
   // A new card receives a fresh countdown.
   type(samples.payment); finish();
-  assert.equal(node('countdown').textContent, 'Swipe clears in 15 seconds.');
-  now += 14_000; tick();
+  assert.equal(node('countdown').textContent, 'Swipe clears in 30 seconds.');
+  now += 29_000; tick();
   assert.equal(node('countdown').textContent, 'Swipe clears in 1 second.');
   assert.equal(node('result-card').hidden, false);
   now += 1000; tick(); assert.equal(node('result-card').hidden, true);
   assert.equal(node('track-structures').children.length, 0);
   assert.equal(node('checks').children.length, 0);
-  assert.equal(node('countdown').textContent, 'Swipes clear after 15 seconds.');
+  assert.equal(node('countdown').textContent, 'Swipes clear after 30 seconds.');
   type(samples.payment); finish(); assert.equal(number(), '•••• 4242');
   doc.hidden = true; doc.dispatchEvent(new Event('visibilitychange')); finish();
   assert.equal(node('result-card').hidden, true);

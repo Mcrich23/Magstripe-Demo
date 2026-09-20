@@ -2,7 +2,7 @@ import { parseSwipe, mask, describeSwipe } from './parser.js';
 import { SwipeCapture } from './capture.js';
 
 const $ = id => document.getElementById(id);
-const CLEAR_AFTER_SECONDS = 15;
+const CLEAR_AFTER_SECONDS = 30;
 let result = null;
 let deadline = 0;
 const capture = new SwipeCapture({
