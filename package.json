@@ -1,0 +1,13 @@
+{
+  "name": "magstripe-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An offline, browser-based magnetic stripe explainer",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test",
+    "check": "node --check server.mjs && node --check public/app.js && node --check public/parser.js && node --check public/capture.js"
+  }
+}
