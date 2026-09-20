@@ -61,7 +61,7 @@ function payment(result, track) {
   const add = (key, label, value, length, description, sensitive, category) => {
     field(result, track, key, label, value, cursor, cursor + length, description, sensitive, category); cursor += length;
   };
-  add('pan', 'Card number', pan, pan.length, 'The primary account number (PAN). Only the last four digits are shown until you reveal details.', true, 'identity');
+  add('pan', 'Card number', pan, pan.length, 'The primary account number (PAN). Only the last four digits are displayed.', true, 'identity');
   cursor++;
   if (t1) { add('name', 'Cardholder name', name.trim() || 'Not provided', name.length, 'Usually encoded as FAMILY/GIVEN NAME. The stripe may abbreviate it.', true, 'identity'); cursor++; }
   add('expiry', 'Expiration', expiry(exp) || 'Invalid month', 4, 'Four digits in YYMM order. Displayed as MM / YY; the century is not encoded.', true, 'date');
@@ -101,4 +101,51 @@ export function parseSwipe(input) {
   result.title = result.kind === 'payment' ? 'Credit / debit card' : 'Unrecognized swipe';
   result.warnings = [...new Set(result.warnings)];
   return result;
+}
+
+/** Explain the received layout while masking full account numbers. */
+export function describeSwipe(result) {
+  const decoded = result.tracks.filter(track => track.decoded);
+  const numbers = result.fields.filter(field => field.key === 'pan');
+  const checksum = numbers.length ? (numbers.every(field => luhn(field.value)) ? 'Pass' : 'Fail') : 'Not checked';
+  const duplicate = new Set(result.tracks.map(track => track.number)).size !== result.tracks.length;
+  let agreement = duplicate ? 'Duplicate tracks' : 'Not checked';
+  if (!duplicate && decoded.length === 1 && result.tracks.length === 1) agreement = 'Single track';
+  if (!duplicate && decoded.some(track => track.number === 1) && decoded.some(track => track.number === 2)) {
+    const values = (track, key) => {
+      const part = track.parts.find(part => part.key === key);
+      return track.raw.slice(part.start, part.end);
+    };
+    const one = decoded.find(track => track.number === 1), two = decoded.find(track => track.number === 2);
+    agreement = ['pan', 'expiry', 'service'].every(key => values(one, key) === values(two, key)) ? 'Match' : 'Mismatch';
+  }
+  return {
+    checksum,
+    agreement,
+    tracks: result.tracks.map(track => {
+      const segments = [];
+      const marker = (text, label) => segments.push({ text, label, kind: 'marker' });
+      const part = (key, label) => {
+        const field = track.parts.find(part => part.key === key);
+        if (!field) return;
+        const raw = track.raw.slice(field.start, field.end);
+        let text = raw || '(empty)';
+        if (key === 'pan') text = '•'.repeat(Math.max(0, raw.length - 4)) + raw.slice(-4);
+        segments.push({ text, label: `${label} · ${raw.length}`, kind: 'field' });
+      };
+      if (track.decoded) {
+        marker(track.number === 1 ? '%' : ';', 'Start');
+        if (track.number === 1) marker('B', 'Format');
+        part('pan', 'Card number');
+        marker(track.number === 1 ? '^' : '=', 'Separator');
+        if (track.number === 1) { part('name', 'Name'); marker('^', 'Separator'); }
+        part('expiry', 'Expiry'); part('service', 'Service'); part('discretionary', 'Issuer data');
+        marker('?', 'End');
+      }
+      return {
+        number: track.number, characters: track.raw.length, segments,
+        note: track.decoded ? '' : track.complete ? 'Unrecognized layout · content hidden' : 'Incomplete track · content hidden',
+      };
+    }),
+  };
 }

@@ -45,6 +45,9 @@ test('hands-free lifecycle: successive swipes, focus recovery, and automatic cle
   assert.equal(node('fields').children.length, 4);
   assert.equal(node('extra-fields').children.length, 2);
   assert.equal(node('extra-fields').hidden, false);
+  assert.equal(node('track-structures').children.length, 2);
+  assert.equal(node('checks').children[0].children[1].textContent, 'Pass');
+  assert.equal(node('checks').children[1].children[1].textContent, 'Match');
   type(';4111111111111111=2912101000?'); finish();
   assert.equal(number(), '•••• 1111');
   type('%B4242'); doc.focused = false; win.dispatchEvent(new Event('blur')); finish();
@@ -63,6 +66,8 @@ test('hands-free lifecycle: successive swipes, focus recovery, and automatic cle
   assert.equal(node('countdown').textContent, 'Swipe clears in 1 second.');
   assert.equal(node('result-card').hidden, false);
   now += 1000; tick(); assert.equal(node('result-card').hidden, true);
+  assert.equal(node('track-structures').children.length, 0);
+  assert.equal(node('checks').children.length, 0);
   assert.equal(node('countdown').textContent, 'Swipes clear after 15 seconds.');
   type(samples.payment); finish(); assert.equal(number(), '•••• 4242');
   doc.hidden = true; doc.dispatchEvent(new Event('visibilitychange')); finish();

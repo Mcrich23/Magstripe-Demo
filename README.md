@@ -18,7 +18,7 @@ You can also double-click `Start.command` on macOS or run `./scripts/start.sh` o
 
 Connect a USB reader in **keyboard mode** and leave this browser window active. Swipe a card; its information appears automatically. There are no buttons, input fields, menus, or manual processing steps.
 
-Each swipe replaces the previous result. Card number, cardholder, expiration, track format, service code, and issuer-data length appear together. The footer counts down, and results clear after 15 seconds or when the window loses focus. Listening resumes automatically when the window becomes active again. The optional Esc shortcut clears immediately.
+Each swipe replaces the previous result. Card number, cardholder, expiration, track format, service code, and issuer-data length appear together. The anatomy view splits the received track text into labeled fields and markers, shows character counts, and explains name/expiry encodings. Full account numbers remain masked; issuer data is shown exactly as received, without interpreting its internal contents. Luhn and shared-field checks provide talking points about integrity versus authentication. The footer counts down, and results clear after 15 seconds or when the window loses focus. Listening resumes automatically when the window becomes active again. The optional Esc shortcut clears immediately.
 
 Results appear after 700 ms without input, allowing Enter/Tab between tracks. Wait for a result before the next swipe. Configure the reader to send start/end markers (`%`, `;`, `?`), all available tracks, and no custom prefix or transmitted LRC. Match the OS keyboard layout to the reader, usually US English.
 
@@ -28,7 +28,7 @@ A web page can receive reader keystrokes only while the browser page is active, 
 
 Supports plain-text payment-card Tracks 1 and 2. State IDs, PDF417 barcodes, encrypted readers, chips and NFC are outside this demo’s scope. Incomplete, conflicting, or unfamiliar data is flagged. This does not authenticate cards or process payments. See [format details and sources](docs/formats.md).
 
-Card numbers stay masked; names and expiration dates are visible in the results. The app never shows the full raw stripe. Use cards whose owners have agreed to the demo, or use the fictional sample.
+Card numbers stay masked; names, expiration dates, and issuer data are visible in the results. The app never shows the full raw stripe. Use cards whose owners have agreed to the demo, or use the fictional sample.
 
 Parsing happens entirely in browser memory. The local server only serves static files, binds to `127.0.0.1`, and accepts no swipe submissions. There is no storage, analytics, history, export, or external dependency. Clearing discards app state; it cannot erase OS memory, screenshots, extensions, or a clipboard used to paste input. This is an educational demo, not a payment-data vault.
 

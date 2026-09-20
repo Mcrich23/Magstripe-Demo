@@ -27,6 +27,15 @@
       <dl id="fields" class="fields"></dl>
       <p id="read-note" class="read-note" hidden></p>
       <dl id="extra-fields" class="fields extra-fields"></dl>
+      <section class="technical" aria-labelledby="technical-title">
+        <h3 id="technical-title">Anatomy of the swipe</h3>
+        <div id="track-structures"></div>
+        <p class="technical-caption">Read left to right. Labels show each field’s character count; • hides card-number characters. Issuer data is shown as read.</p>
+        <p class="technical-caption">B = financial format · Name = LAST/FIRST · Expiry = YYMM · Service = usage rules.</p>
+        <dl id="checks" class="checks"></dl>
+        <p class="technical-caption">Luhn checks the number’s checksum. Shared fields compares the number, expiration, and service code across Tracks 1 and 2.</p>
+        <p class="security-insight"><strong>Readable ≠ authenticated.</strong> This reader sends plain text, and a passing checksum doesn’t prove a card is genuine.</p>
+      </section>
     </section>
 
     <p class="privacy-note"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="4" y="9" width="12" height="9" rx="2"/><path d="M6.5 9V6a3.5 3.5 0 0 1 7 0v3"/></svg><span>Card numbers are masked. Nothing is saved or sent. <span id="countdown">Swipes clear after 15 seconds.</span></span></p>

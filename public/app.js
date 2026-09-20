@@ -1,4 +1,4 @@
-import { parseSwipe, mask } from './parser.js';
+import { parseSwipe, mask, describeSwipe } from './parser.js';
 import { SwipeCapture } from './capture.js';
 
 const $ = id => document.getElementById(id);
@@ -23,6 +23,7 @@ function clearResult(resetCapture = true) {
   result = null; deadline = 0;
   updateCountdown();
   $('fields').replaceChildren(); $('extra-fields').replaceChildren();
+  $('track-structures').replaceChildren(); $('checks').replaceChildren();
   $('read-note').textContent = ''; $('read-note').hidden = true;
   $('result-card').hidden = true; $('empty-state').hidden = false;
   document.querySelector('.status-card').classList.remove('has-result');
@@ -60,6 +61,28 @@ function showResult(raw) {
   $('status').textContent = result.kind === 'unknown' ? 'Swipe received — unrecognized format'
     : result.warnings.length ? 'Swipe received — check the read' : 'Card read';
   $('reader-note').textContent = 'Ready for the next swipe.';
+  showTechnicalDetails();
+}
+
+function showTechnicalDetails() {
+  const info = describeSwipe(result);
+  $('checks').replaceChildren(); $('track-structures').replaceChildren();
+  addField($('checks'), 'Luhn checksum', info.checksum);
+  addField($('checks'), 'Shared fields', info.agreement);
+  for (const track of info.tracks) {
+    const row = document.createElement('div'); row.className = 'track-structure';
+    const label = document.createElement('p');
+    label.textContent = `Track ${track.number} · ${track.characters} characters`;
+    const layout = document.createElement('div'); layout.className = 'track-segments';
+    for (const segment of track.segments) {
+      const piece = document.createElement('div'); piece.className = `track-piece${segment.kind === 'marker' ? ' marker' : ''}`;
+      const code = document.createElement('code'); code.textContent = segment.text;
+      const caption = document.createElement('span'); caption.textContent = segment.label;
+      piece.append(code, caption); layout.append(piece);
+    }
+    if (track.note) { const note = document.createElement('p'); note.textContent = track.note; layout.append(note); }
+    row.append(label, layout); $('track-structures').append(row);
+  }
 }
 
 function pauseReader() {

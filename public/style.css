@@ -27,6 +27,22 @@ p { color: #74747c; margin: 8px 0 0; }
 dt { color: #707079; flex-shrink: 0; }
 dd { margin: 0; text-align: right; overflow-wrap: anywhere; min-width: 0; }
 #extra-fields { margin-top: 18px; font-size: 14px; }
+.technical { border-top: 1px solid #e9e9ed; margin-top: 22px; padding-top: 18px; }
+.technical h3 { font-size: 15px; font-weight: 600; margin: 0 0 13px; }
+.track-structure { padding: 10px 12px; background: #f5f6f8; border-radius: 8px; margin-top: 8px; }
+.track-structure p { font-size: 11px; margin: 0 0 5px; color: #727784; }
+.track-segments { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; }
+.track-piece { min-width: 0; max-width: 100%; padding: 6px 8px; border-radius: 5px; background: #e8eef7; }
+.track-piece code { display: block; font: 12px/1.8 ui-monospace, SFMono-Regular, Consolas, monospace; color: #315887; overflow-wrap: anywhere; white-space: pre-wrap; }
+.track-piece span { display: block; font-size: 9px; color: #64788e; margin-top: 2px; }
+.track-piece.marker { background: transparent; padding-left: 3px; padding-right: 3px; }
+.track-piece.marker code { color: #616874; }
+.technical-caption { font-size: 11px; line-height: 1.6; margin-top: 9px; }
+.checks { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 14px 0 0; }
+.checks .field { font-size: 12px; padding: 0; gap: 10px; }
+.checks dd { font-weight: 600; }
+.security-insight { border-left: 2px solid #91bdf0; padding-left: 11px; margin-top: 14px; font-size: 12px; color: #626b79; }
+.security-insight strong { color: #42516a; font-weight: 600; }
 .read-note { border-radius: 8px; background: #fff7e9; color: #906b30; padding: 11px 13px; font-size: 13px; margin-top: 18px; }
 .privacy-note { display: flex; align-items: flex-start; justify-content: center; gap: 7px; padding: 0 5px; font-size: 12px; color: #81818a; }
 .privacy-note svg { width: 16px; height: 18px; flex: 0 0 16px; stroke: currentColor; stroke-width: 1.2; }
@@ -42,5 +58,6 @@ dd { margin: 0; text-align: right; overflow-wrap: anywhere; min-width: 0; }
   .empty-state { padding: 35px 20px; }
   .field { font-size: 14px; gap: 15px; }
   .privacy-note { font-size: 11px; }
+  .checks { grid-template-columns: 1fr; gap: 8px; }
 }
 @media print { body { display: none; } }
