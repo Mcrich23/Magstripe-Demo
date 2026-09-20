@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Magstripe Lab — See what’s on the stripe</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="/" aria-label="Magstripe Lab home"><span class="brand-mark" aria-hidden="true">▥</span> MAGSTRIPE <span class="brand-light">LAB</span><span class="version">01</span></a>
+    <div class="header-right"><span class="local-badge"><span class="dot"></span> LOCAL & OFFLINE</span><button id="help-button" class="text-button">Reader setup <span aria-hidden="true">↗</span></button></div>
+  </header>
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow">A LITTLE STRIPE. A LOT OF INFORMATION.</p><h1>See what’s on<br>the <span class="stripe-word">stripe.</span></h1></div>
+      <p class="intro-copy">Turn a swipe into a story.<br>Explore the information encoded on a payment card or state ID, one field at a time.</p>
+    </section>
+    <div class="workspace">
+      <aside class="controls" aria-label="Swipe controls">
+        <section class="capture-panel">
+          <div class="panel-kicker"><span>01 / CAPTURE</span><span id="capture-state" class="status-pill">PAUSED</span></div>
+          <div class="reader-art" aria-hidden="true"><div class="art-card"><span>MAGSTRIPE LAB</span><div class="magstripe"></div><i>SWIPE TO EXPLORE ↗</i></div><div class="reader-slot"></div><div class="reader-base"><span></span></div></div>
+          <h2 id="capture-heading">Your reader. Your browser.</h2>
+          <p id="capture-instruction">Connect your USB reader, start capture, then swipe a card.</p>
+          <button id="capture-button" class="primary-button"><span id="capture-button-label">Start capture</span><span aria-hidden="true">→</span></button>
+          <div class="reader-status"><span id="reader-dot" class="dot"></span><span id="reader-status">Keyboard-style USB reader</span></div>
+        </section>
+        <section class="sample-panel">
+          <p class="eyebrow">NO CARD HANDY?</p><h3>Take a sample for a spin.</h3>
+          <div class="sample-buttons"><button id="sample-payment"><span aria-hidden="true">▱</span> Payment card <span aria-hidden="true">↗</span></button><button id="sample-id"><span aria-hidden="true">▤</span> State ID <span aria-hidden="true">↗</span></button></div>
+          <p class="small muted">Fictional details. Same decoding experience.</p>
+        </section>
+        <details class="settings"><summary>Input options <span aria-hidden="true">+</span></summary><div class="settings-body">
+          <label for="format">Card format</label><select id="format"><option value="auto">Detect automatically</option><option value="payment">Payment card</option><option value="id">AAMVA state ID</option></select>
+          <label for="delay">Wait between tracks</label><select id="delay"><option value="700">Standard · 0.7 seconds</option><option value="1500">Slower reader · 1.5 seconds</option></select>
+          <label for="clear-after">Clear after</label><select id="clear-after"><option value="30">30 seconds</option><option value="60" selected>1 minute</option><option value="120">2 minutes</option><option value="300">5 minutes</option></select>
+          <button id="paste-button" class="secondary-button">Paste a swipe instead</button>
+        </div></details>
+        <div class="privacy-note"><span aria-hidden="true">◈</span><p><strong>Only here. Only for now.</strong><br>Swipes stay in this page’s memory. Details start hidden and clear automatically.</p></div>
+      </aside>
+      <section class="results" aria-label="Swipe results">
+        <div class="results-toolbar"><p class="eyebrow">02 / EXPLORE</p><div class="toolbar-actions"><span id="countdown" class="small muted" hidden></span><button id="clear-button" class="text-button" disabled>Clear <kbd>Esc</kbd></button></div></div>
+        <div id="empty-state" class="empty-state">
+          <div class="empty-graphic" aria-hidden="true"><span class="empty-orbit"></span><span class="empty-card">≋</span><i class="orbit-node node-1"></i><i class="orbit-node node-2"></i><i class="orbit-node node-3"></i></div>
+          <p class="eyebrow">WAITING FOR A LITTLE DISCOVERY</p><h2>Every swipe has a story.</h2><p>Swipe a card or choose a sample.<br>We’ll turn the encoded tracks into something readable.</p>
+          <div class="empty-tags"><span>PAYMENT CARDS</span><span>STATE IDs</span><span>3 TRACKS</span></div>
+        </div>
+        <div id="result-content" hidden>
+          <div class="result-heading"><div><div class="result-labels"><span id="result-source" class="tag"></span><span id="result-status" class="small muted"></span></div><h2 id="result-title"></h2><p id="result-subtitle" class="muted"></p></div><button id="reveal-button" class="secondary-button" aria-pressed="false">Reveal details</button></div>
+          <div id="warnings" class="warnings" hidden></div>
+          <div id="stats" class="stats"></div>
+          <div class="section-heading"><h3>Inside the stripe</h3><span class="small muted">Select a track to explore</span></div>
+          <div id="track-tabs" class="track-tabs" role="tablist" aria-label="Magnetic tracks"></div>
+          <div id="track-panel" role="tabpanel" aria-labelledby="track-tab-0" tabindex="0">
+            <div class="track-heading"><span id="track-description" class="small muted"></span><span class="small mono">START → END</span></div>
+            <div id="track-map" class="track-map"></div>
+            <p class="track-hint">Select a colored segment to find its decoded field below.</p>
+            <div id="field-list" class="field-list"></div>
+            <details id="raw-details" class="raw-details"><summary>Encoded track <span aria-hidden="true">+</span></summary><p id="raw-note" class="small muted"></p><pre id="raw-track"></pre></details>
+          </div>
+          <div class="interpretation-note"><span aria-hidden="true">ⓘ</span><p id="interpretation-text"></p></div>
+        </div>
+      </section>
+    </div>
+    <section class="learn-strip" aria-label="How it works"><div><span class="step-number">01</span><p><strong>A magnetic memory</strong><br>Tiny magnetic regions encode characters.</p></div><div><span class="step-number">02</span><p><strong>Read in parallel</strong><br>Up to three tracks tell different parts of the story.</p></div><div><span class="step-number">03</span><p><strong>Decoded, not verified</strong><br>A readable stripe doesn’t authenticate a card.</p></div></section>
+  </main>
+  <footer><span>MAGSTRIPE LAB <span class="muted">/ An experiment in everyday data</span></span><span class="muted">NO CLOUD. NO ACCOUNT. JUST A SWIPE.</span></footer>
+  <p id="announcer" class="sr-only" role="status" aria-live="polite"></p>
+  <dialog id="help-dialog" aria-labelledby="help-title"><div class="dialog-top"><p class="eyebrow">GET CONNECTED</p><button class="close-dialog text-button" aria-label="Close reader setup">✕</button></div><h2 id="help-title">Plug in. Click. Swipe.</h2><ol class="help-steps"><li><strong>Connect your USB reader.</strong><p>Use keyboard / HID keyboard mode. Swiping should type text like a keyboard. Set your keyboard layout to match the reader, usually US English.</p></li><li><strong>Click Start capture.</strong><p>Keep this browser window in front. The status tells you when this page is listening; it cannot detect whether a USB reader is connected.</p></li><li><strong>Swipe and explore.</strong><p>Keep start/end markers enabled (% or ; and ?). Enable all available tracks. Readers that pause between tracks can use the slower setting under Input options.</p></li></ol><div class="help-callout"><strong>Working with state IDs</strong><p>This demo reads legacy AAMVA magnetic stripes. A PDF417 barcode needs a barcode reader; it cannot be read by swiping. State formats and track availability vary.</p></div><p class="small muted">No swipes are sent to the local server or saved by this app. Revealing details displays personal data on screen. Clear between participants. Switching tabs clears the result; leaving the window hides details and pauses capture.</p><button class="close-dialog primary-button">Got it <span aria-hidden="true">→</span></button></dialog>
+  <dialog id="paste-dialog" aria-labelledby="paste-title"><div class="dialog-top"><p class="eyebrow">MANUAL INPUT</p><button class="close-dialog text-button" aria-label="Close paste input">✕</button></div><h2 id="paste-title">Paste a swipe.</h2><p class="muted">Include the start and end markers. Separate tracks with line breaks or paste them together.</p><label for="paste-input">Swipe text</label><textarea id="paste-input" maxlength="4096" rows="6" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="%B…?&#10;;…?"></textarea><p class="small muted">This input is visible while pasting and is emptied after decoding.</p><button id="decode-button" class="primary-button">Decode swipe <span aria-hidden="true">→</span></button></dialog>
+  <noscript>This demo needs JavaScript enabled. It runs entirely in your browser.</noscript>
+</body>
+</html>
