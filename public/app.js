@@ -2,6 +2,7 @@ import { parseSwipe, mask } from './parser.js';
 import { SwipeCapture } from './capture.js';
 
 const $ = id => document.getElementById(id);
+const CLEAR_AFTER_SECONDS = 15;
 let result = null;
 let deadline = 0;
 const capture = new SwipeCapture({
@@ -20,6 +21,7 @@ const capture = new SwipeCapture({
 function clearResult(resetCapture = true) {
   if (resetCapture) capture.reset();
   result = null; deadline = 0;
+  updateCountdown();
   $('fields').replaceChildren(); $('extra-fields').replaceChildren();
   $('read-note').textContent = ''; $('read-note').hidden = true;
   $('result-card').hidden = true; $('empty-state').hidden = false;
@@ -39,7 +41,8 @@ function formatName(value) {
 }
 function showResult(raw) {
   capture.reset();
-  result = parseSwipe(raw); deadline = Date.now() + 60_000;
+  result = parseSwipe(raw); deadline = Date.now() + CLEAR_AFTER_SECONDS * 1000;
+  updateCountdown();
   const get = key => result.fields.find(field => field.key === key)?.value;
   const tracks = [...new Set(result.tracks.filter(track => track.decoded).map(track => track.number))];
   $('fields').replaceChildren(); $('extra-fields').replaceChildren();
@@ -81,5 +84,13 @@ window.addEventListener('focus', resumeReader);
 document.addEventListener('visibilitychange', () => { if (document.hidden) pauseReader(); else resumeReader(); });
 window.addEventListener('pagehide', pauseReader);
 window.addEventListener('pageshow', resumeReader);
-setInterval(() => { if (result && Date.now() >= deadline) clearResult(); }, 1000);
+function updateCountdown() {
+  const seconds = result ? Math.max(0, Math.ceil((deadline - Date.now()) / 1000)) : CLEAR_AFTER_SECONDS;
+  if (result && seconds === 0) { clearResult(); return; }
+  const text = result ? `Swipe clears in ${seconds} ${seconds === 1 ? 'second' : 'seconds'}.`
+    : `Swipes clear after ${CLEAR_AFTER_SECONDS} seconds.`;
+  if ($('countdown').textContent !== text) $('countdown').textContent = text;
+}
+setInterval(updateCountdown, 250);
+updateCountdown();
 resumeReader();

@@ -18,7 +18,7 @@ You can also double-click `Start.command` on macOS or run `./scripts/start.sh` o
 
 Connect a USB reader in **keyboard mode** and leave this browser window active. Swipe a card; its information appears automatically. There are no buttons, input fields, menus, or manual processing steps.
 
-Each swipe replaces the previous result. Card number, cardholder, expiration, track format, service code, and issuer-data length appear together. Results clear after 60 seconds or when the window loses focus. Listening resumes automatically when the window becomes active again. The optional Esc shortcut clears immediately.
+Each swipe replaces the previous result. Card number, cardholder, expiration, track format, service code, and issuer-data length appear together. The footer counts down, and results clear after 15 seconds or when the window loses focus. Listening resumes automatically when the window becomes active again. The optional Esc shortcut clears immediately.
 
 Results appear after 700 ms without input, allowing Enter/Tab between tracks. Wait for a result before the next swipe. Configure the reader to send start/end markers (`%`, `;`, `?`), all available tracks, and no custom prefix or transmitted LRC. Match the OS keyboard layout to the reader, usually US English.
 

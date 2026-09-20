@@ -3,7 +3,7 @@
 Checked locally on macOS on September 20, 2026.
 
 - `npm test`: 14 passing tests for parsing, masking, track disagreements, invalid dates, incomplete reads, capture timing, Enter/Tab framing, paste, cancellation, input bounds, static asset serving, loopback host restrictions, HTTP method restrictions, and response headers.
-- UI controller lifecycle regression covers focus loss, automatic resume, discarding partial reads, visibility changes, successive swipes, and 60-second clearing with a controlled clock.
+- UI controller lifecycle regression covers focus loss, automatic resume, discarding partial reads, visibility changes, successive swipes, and 15-second clearing and the live countdown (including reset on a new swipe) with a controlled clock.
 - `npm run check`: JavaScript syntax passes.
 - `sh -n scripts/start.sh Start.command`: launcher syntax passes.
 - Real in-app browser: hands-free capture immediately after page load; two-track keyboard simulation with Enter after each track; a second Track 2-only swipe replaces the first with no intervening click; all six result fields are visible without disclosure controls. No buttons, input fields, or menus remain.
