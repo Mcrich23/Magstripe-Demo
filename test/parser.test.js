@@ -29,6 +29,27 @@ test('membership read survives missing Track 2 while incomplete Track 1 stays hi
   assert.equal(parseSwipe(samples.membership + samples.payment).kind, 'payment');
 });
 
+test('membership Track 1 takes precedence over payment-shaped Track 2', () => {
+  const r = parseSwipe(samples.membershipBoth);
+  assert.equal(r.kind, 'membership'); assert.deepEqual(r.warnings, []);
+  assert.ok(r.tracks.every(t => t.decoded));
+  assert.deepEqual(r.fields.filter(f => f.key === 'memberId').map(f => f.value), ['7000000012345678', '7000000012345678']);
+  assert.deepEqual(r.fields.filter(f => f.key === 'extra').map(f => f.value), ['000000000000', '24127990000000000000']);
+  for (const key of ['pan', 'expiry', 'service']) assert.equal(value(r, key), undefined);
+  for (const track of r.tracks) for (const part of track.parts) {
+    assert.equal(track.raw.slice(part.start, part.end), part.value);
+  }
+  const mismatch = parseSwipe(samples.membershipBoth.replace(';7000000012345678', ';7000000087654321'));
+  assert.ok(mismatch.warnings.some(w => w.includes('Member number differs')));
+  const reversed = samples.membershipBoth.match(/[^?]+\?/g).reverse().join('\r\n');
+  assert.equal(parseSwipe(reversed).kind, 'membership');
+  assert.deepEqual(parseSwipe(reversed).warnings, []);
+  const partial = parseSwipe(samples.membershipBoth.slice(0, -1));
+  assert.equal(partial.kind, 'membership'); assert.equal(partial.tracks[0].decoded, true);
+  assert.equal(partial.tracks[1].decoded, false);
+  assert.equal(parseSwipe(samples.membershipBoth + samples.payment).kind, 'payment');
+});
+
 test('payment tracks decode and annotate exact byte ranges', () => {
   const r = parseSwipe(samples.payment);
   assert.equal(r.kind, 'payment'); assert.equal(r.tracks.length, 2); assert.deepEqual(r.warnings, []);

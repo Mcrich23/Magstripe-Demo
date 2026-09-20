@@ -45,6 +45,22 @@ function formatName(value) {
   const [family, ...given] = value.trim().split('/');
   return (given.length ? `${given.join(' ')} ${family}` : family).replace(/\s+/g, ' ').trim();
 }
+
+function fieldDefinitions(result) {
+  if (result.kind === 'student') return [['studentId', 'Student ID']];
+  if (result.kind === 'membership') {
+    const tracks = result.tracks.filter(track => track.decoded).sort((a, b) => a.number - b.number);
+    return [
+      ['memberId', 'Member number'], ['name', 'Cardholder'],
+      ...tracks.map(track => ['extra', tracks.length > 1 ? `Track ${track.number} data` : 'Additional data', track.number]),
+    ];
+  }
+  return [
+    ['pan', 'Card number'], ['name', 'Cardholder'], ['expiry', 'Expiration'],
+    ['service', 'Service code'], ['discretionary', 'Issuer data'],
+  ];
+}
+
 function showResult(raw) {
   capture.reset();
   $('reading-state').hidden = true; $('reading-progress').textContent = '';
@@ -58,14 +74,10 @@ function showResult(raw) {
   $('format-note').hidden = isMember;
   $('payment-markers').hidden = isStudent || isMember;
   $('membership-markers').hidden = !isMember;
-  const definitions = isStudent ? [['studentId', 'Student ID']] : isMember ? [
-    ['memberId', 'Member number'], ['name', 'Cardholder'], ['extra', 'Additional data'],
-  ] : [
-    ['pan', 'Card number'], ['name', 'Cardholder'], ['expiry', 'Expiration'],
-    ['service', 'Service code'], ['discretionary', 'Issuer data'],
-  ];
-  for (const [key, label] of definitions) {
-    const track = result.tracks.find(track => track.decoded && track.parts.some(part => part.key === key));
+  for (const [key, label, trackNumber] of fieldDefinitions(result)) {
+    const track = result.tracks.find(track => track.decoded
+      && (trackNumber === undefined || track.number === trackNumber)
+      && track.parts.some(part => part.key === key));
     const part = track?.parts.find(part => part.key === key);
     const raw = part ? track.raw.slice(part.start, part.end) : '';
     const encoded = key === 'pan' && raw ? mask(raw, true) : raw || '—';
@@ -98,7 +110,8 @@ function showTechnicalDetails() {
   const info = describeSwipe(result);
   $('checks').replaceChildren(); $('track-structures').replaceChildren();
   if (result.kind === 'payment') addField($('checks'), 'Number check (Luhn)', info.checksum);
-  addField($('checks'), result.kind === 'student' ? 'Student ID across tracks' : 'Same details on both tracks', info.agreement);
+  const agreementLabel = { student: 'Student ID across tracks', membership: 'Member number across tracks' };
+  addField($('checks'), agreementLabel[result.kind] ?? 'Same details on both tracks', info.agreement);
   for (const track of info.tracks) {
     const row = document.createElement('div'); row.className = 'track-structure';
     const label = document.createElement('p'); label.className = 'track-label';

@@ -87,23 +87,39 @@ function student(result, track) {
 }
 
 // Membership-style layout supplied by the user; do not infer payment fields.
-function membershipMatch(raw) {
+function membershipTrack1(raw) {
   return /^%(\d{1,32})\^([^\^?]{0,52})\^([^\^?]*)\?$/.exec(raw);
 }
 
 function membership(result, track) {
-  const match = membershipMatch(track.raw);
+  const firstTrack = track.number === 1;
+  const match = firstTrack ? membershipTrack1(track.raw) : /^;(\d{1,32})=([\d=]*)\?$/.exec(track.raw);
   if (!match) return;
-  const [, number, name, extra] = match;
+  const number = match[1], name = firstTrack ? match[2] : '', extra = firstTrack ? match[3] : match[2];
   field(result, track, 'memberId', 'Member number', number, 1, 1 + number.length,
     'Numeric identifier on this membership-style card.', true, 'identity');
   const nameStart = number.length + 2;
   if (name.length) field(result, track, 'name', 'Cardholder', name.trim() || 'Not provided', nameStart, nameStart + name.length,
     'Name text between the two field separators.', true, 'identity');
-  const extraStart = nameStart + name.length + 1;
+  const extraStart = firstTrack ? nameStart + name.length + 1 : number.length + 2;
   if (extra.length) field(result, track, 'extra', 'Additional data', extra, extraStart, extraStart + extra.length,
     'Card-specific data shown as received; no internal layout is inferred.', true);
   track.decoded = true;
+}
+
+const CARD_FORMATS = {
+  payment: { title: 'Credit / debit card', decode: payment, sharedKeys: ['pan', 'expiry', 'service'] },
+  student: { title: 'Student ID', decode: student, sharedKeys: ['studentId'] },
+  membership: { title: 'Membership card', decode: membership, sharedKeys: ['memberId'] },
+};
+
+function detectFormat(tracks) {
+  // Explicit Track 1 layouts identify the card before ambiguous numeric Track 2.
+  if (tracks.some(t => /^%B\d/.test(t.raw))) return 'payment';
+  if (tracks.some(t => t.complete && membershipTrack1(t.raw))) return 'membership';
+  if (studentProfile(tracks)) return 'student';
+  if (tracks.some(t => /^;\d{12,19}=\d{7}/.test(t.raw))) return 'payment';
+  return 'unknown';
 }
 
 export function parseSwipe(input) {
@@ -112,14 +128,11 @@ export function parseSwipe(input) {
   if (input.length > MAX_INPUT) { result.warnings.push('The input is too long for a magnetic stripe. Clear it and try one swipe.'); return result; }
   if (/ANSI |AAMVA|^@\s*[\r\n]/.test(input)) { result.warnings.push('This looks like a PDF417 barcode, not a magnetic stripe. Barcode decoding is not supported in this demo.'); return result; }
   result.tracks = tokenize(input, result.warnings);
-  const payEvidence = result.tracks.some(t => /^%B\d/.test(t.raw) || /^;\d{12,19}=\d{7}/.test(t.raw));
-  const memberEvidence = result.tracks.some(t => t.complete && membershipMatch(t.raw));
-  result.kind = payEvidence ? 'payment' : studentProfile(result.tracks) ? 'student' : memberEvidence ? 'membership' : 'unknown';
+  result.kind = detectFormat(result.tracks);
+  const format = CARD_FORMATS[result.kind];
   for (const track of result.tracks) {
     if (!track.complete) { result.warnings.push(`Track ${track.number} is incomplete (missing ? end marker). Try swiping again.`); continue; }
-    if (result.kind === 'payment') payment(result, track);
-    if (result.kind === 'student') student(result, track);
-    if (result.kind === 'membership') membership(result, track);
+    format?.decode(result, track);
     if (!track.decoded) result.warnings.push(`Track ${track.number} is present but its layout is unsupported. Its data is left uninterpreted.`);
   }
   const seen = new Set();
@@ -127,15 +140,15 @@ export function parseSwipe(input) {
     if (seen.has(t.number)) result.warnings.push(`More than one Track ${t.number} was received. Clear and swipe one card at a time.`);
     seen.add(t.number);
   }
-  for (const key of ['pan', 'expiry', 'service', 'studentId']) {
-    const values = result.fields.filter(f => f.key === key).map(f => f.value);
-    if (new Set(values).size > 1) result.warnings.push(`${key === 'pan' ? 'Card number' : key === 'expiry' ? 'Expiration' : key === 'studentId' ? 'Student ID' : 'Service code'} differs between tracks. Try a fresh swipe; these may be mixed or damaged reads.`);
+  for (const key of format?.sharedKeys ?? []) {
+    const fields = result.fields.filter(f => f.key === key);
+    if (new Set(fields.map(f => f.value)).size > 1) result.warnings.push(`${fields[0].label} differs between tracks. Try a fresh swipe; these may be mixed or damaged reads.`);
   }
   if (!result.fields.length) {
     result.kind = 'unknown';
     result.warnings.push('No supported fields found. Check that the reader sends plain-text tracks with start and end markers; encrypted and proprietary outputs cannot be decoded here.');
   }
-  result.title = result.kind === 'payment' ? 'Credit / debit card' : result.kind === 'student' ? 'Student ID' : result.kind === 'membership' ? 'Membership card' : 'Unrecognized swipe';
+  result.title = CARD_FORMATS[result.kind]?.title ?? 'Unrecognized swipe';
   result.warnings = [...new Set(result.warnings)];
   return result;
 }
@@ -154,7 +167,7 @@ export function describeSwipe(result) {
       return track.raw.slice(part.start, part.end);
     };
     const one = decoded.find(track => track.number === 1), two = decoded.find(track => track.number === 2);
-    const keys = result.kind === 'student' ? ['studentId'] : ['pan', 'expiry', 'service'];
+    const keys = CARD_FORMATS[result.kind].sharedKeys;
     agreement = keys.every(key => values(one, key) === values(two, key)) ? 'Match' : 'Mismatch';
   }
   return {
@@ -177,8 +190,10 @@ export function describeSwipe(result) {
         if (track.number === 2) segments.push({ text: track.raw.slice(8, 10), kind: 'literal' });
         marker('?', 'End');
       } else if (track.decoded && result.kind === 'membership') {
-        marker('%', 'Start'); part('memberId', 'Member number'); marker('^', 'Separator');
-        part('name', 'Name'); marker('^', 'Separator'); part('extra', 'Additional data');
+        marker(track.number === 1 ? '%' : ';', 'Start'); part('memberId', 'Member number');
+        marker(track.number === 1 ? '^' : '=', 'Separator');
+        if (track.number === 1) { part('name', 'Name'); marker('^', 'Separator'); }
+        part('extra', 'Additional data');
         marker('?', 'End');
       } else if (track.decoded) {
         marker(track.number === 1 ? '%' : ';', 'Start');

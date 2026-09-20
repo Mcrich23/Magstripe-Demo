@@ -12,6 +12,12 @@ test('membership breakdown preserves its fields and omits invented payment marke
   const partial = describe(samples.membership + ';');
   assert.equal(partial.agreement, 'Not checked');
   assert.deepEqual(partial.tracks[1].segments, []);
+  const both = describe(samples.membershipBoth);
+  assert.equal(both.agreement, 'Match'); assert.equal(both.checksum, 'Not checked');
+  assert.deepEqual(both.tracks[1].segments.map(s => s.text), [';', '7000000012345678', '=', '24127990000000000000', '?']);
+  assert.equal(both.tracks.map(t => t.segments.map(s => s.text).join('')).join(''), samples.membershipBoth);
+  assert.equal(describe(samples.membershipBoth.replace(';7000000012345678', ';7000000087654321')).agreement, 'Mismatch');
+  assert.equal(describe(samples.membershipBoth + samples.membershipBoth).agreement, 'Duplicate tracks');
 });
 
 test('annotated tracks preserve encoded order while masking PAN and showing issuer values', () => {
