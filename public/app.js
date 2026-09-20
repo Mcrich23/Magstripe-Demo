@@ -22,7 +22,7 @@ function clearResult(resetCapture = true) {
   if (resetCapture) capture.reset();
   result = null; deadline = 0;
   updateCountdown();
-  $('fields').replaceChildren(); $('extra-fields').replaceChildren();
+  $('fields').replaceChildren();
   $('track-structures').replaceChildren(); $('checks').replaceChildren();
   $('read-note').textContent = ''; $('read-note').hidden = true;
   $('result-card').hidden = true; $('empty-state').hidden = false;
@@ -44,16 +44,30 @@ function showResult(raw) {
   capture.reset();
   result = parseSwipe(raw); deadline = Date.now() + CLEAR_AFTER_SECONDS * 1000;
   updateCountdown();
-  const get = key => result.fields.find(field => field.key === key)?.value;
-  const tracks = [...new Set(result.tracks.filter(track => track.decoded).map(track => track.number))];
-  $('fields').replaceChildren(); $('extra-fields').replaceChildren();
-  addField($('fields'), 'Card number', get('pan') ? mask(get('pan'), true) : null);
-  addField($('fields'), 'Cardholder', formatName(get('name')));
-  addField($('fields'), 'Expiration', get('expiry'));
-  addField($('fields'), 'Track format', tracks.length ? `Track ${tracks.join(' + ')}` : 'Unknown');
-  addField($('extra-fields'), 'Service code', get('service'));
-  addField($('extra-fields'), 'Issuer data', get('discretionary'));
-  $('extra-fields').hidden = result.kind === 'unknown';
+  $('fields').replaceChildren();
+  const definitions = [
+    ['pan', 'Card number'], ['name', 'Cardholder'], ['expiry', 'Expiration'],
+    ['service', 'Service code'], ['discretionary', 'Issuer data'],
+  ];
+  for (const [key, label] of definitions) {
+    const track = result.tracks.find(track => track.decoded && track.parts.some(part => part.key === key));
+    const part = track?.parts.find(part => part.key === key);
+    const raw = part ? track.raw.slice(part.start, part.end) : '';
+    const encoded = key === 'pan' && raw ? mask(raw, true) : raw || '—';
+    const meanings = {
+      pan: `Primary account number${raw ? ` · ${raw.length} digits` : ''}`,
+      name: formatName(raw),
+      expiry: part ? `${part.value} · YYMM` : 'Not available',
+      service: 'Usage and authorization rules',
+      discretionary: `Issuer-specific${raw ? ` · ${raw.length} characters` : ''}`,
+    };
+    const row = document.createElement('tr'); row.className = `key-${key}`;
+    const heading = document.createElement('th'); heading.scope = 'row'; heading.textContent = label;
+    const value = document.createElement('td'); value.className = 'encoded'; value.textContent = encoded;
+    const meaning = document.createElement('td'); meaning.textContent = meanings[key];
+    row.append(heading, value, meaning); $('fields').append(row);
+  }
+  $('fields-table').hidden = result.kind === 'unknown';
   $('read-note').hidden = !result.warnings.length;
   $('read-note').textContent = result.warnings.length ? result.warnings[0] : '';
   $('empty-state').hidden = true; $('result-card').hidden = false;
@@ -71,16 +85,18 @@ function showTechnicalDetails() {
   addField($('checks'), 'Shared fields', info.agreement);
   for (const track of info.tracks) {
     const row = document.createElement('div'); row.className = 'track-structure';
-    const label = document.createElement('p');
-    label.textContent = `Track ${track.number} · ${track.characters} characters`;
-    const layout = document.createElement('div'); layout.className = 'track-segments';
+    const label = document.createElement('p'); label.className = 'track-label';
+    const name = document.createElement('strong'); name.textContent = `Track ${track.number}`;
+    const length = document.createElement('span'); length.textContent = `${track.characters} characters`;
+    label.append(name, length);
+    const layout = document.createElement('code'); layout.className = 'track-stream';
     for (const segment of track.segments) {
-      const piece = document.createElement('div'); piece.className = `track-piece${segment.kind === 'marker' ? ' marker' : ''}`;
-      const code = document.createElement('code'); code.textContent = segment.text;
-      const caption = document.createElement('span'); caption.textContent = segment.label;
-      piece.append(code, caption); layout.append(piece);
+      const piece = document.createElement('span');
+      piece.className = segment.kind === 'marker' ? 'marker' : `data key-${segment.key}`;
+      piece.textContent = segment.text;
+      layout.append(piece);
     }
-    if (track.note) { const note = document.createElement('p'); note.textContent = track.note; layout.append(note); }
+    if (track.note) layout.textContent = track.note;
     row.append(label, layout); $('track-structures').append(row);
   }
 }

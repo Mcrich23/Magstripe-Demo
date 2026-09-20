@@ -124,14 +124,14 @@ export function describeSwipe(result) {
     agreement,
     tracks: result.tracks.map(track => {
       const segments = [];
-      const marker = (text, label) => segments.push({ text, label, kind: 'marker' });
+      const marker = (text, label) => segments.push({ text, label, key: 'marker', kind: 'marker' });
       const part = (key, label) => {
         const field = track.parts.find(part => part.key === key);
         if (!field) return;
         const raw = track.raw.slice(field.start, field.end);
-        let text = raw || '(empty)';
+        let text = raw;
         if (key === 'pan') text = '•'.repeat(Math.max(0, raw.length - 4)) + raw.slice(-4);
-        segments.push({ text, label: `${label} · ${raw.length}`, kind: 'field' });
+        segments.push({ text, label: `${label} · ${raw.length}`, key, kind: 'field' });
       };
       if (track.decoded) {
         marker(track.number === 1 ? '%' : ';', 'Start');

@@ -42,10 +42,11 @@ test('hands-free lifecycle: successive swipes, focus recovery, and automatic cle
   assert.equal(node('status').textContent, 'Ready for a swipe');
   type(samples.payment.replace('?;', '?\n;')); finish();
   assert.equal(number(), '•••• 4242');
-  assert.equal(node('fields').children.length, 4);
-  assert.equal(node('extra-fields').children.length, 2);
-  assert.equal(node('extra-fields').hidden, false);
+  assert.equal(node('fields').children.length, 5);
+  assert.equal(node('fields-table').hidden, false);
   assert.equal(node('track-structures').children.length, 2);
+  const stream = node('track-structures').children[0].children[1];
+  assert.equal(stream.children.map(part => part.textContent).join(''), '%B••••••••••••4242^EXAMPLE/JAMIE^29121010000000000?');
   assert.equal(node('checks').children[0].children[1].textContent, 'Pass');
   assert.equal(node('checks').children[1].children[1].textContent, 'Match');
   type(';4111111111111111=2912101000?'); finish();

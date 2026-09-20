@@ -1,63 +1,77 @@
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #202124;
-  background: #f4f4f6;
+  color: #292d32;
+  background: #f5f5f6;
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
+  --mono: ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 * { box-sizing: border-box; }
-body { margin: 0; font-size: 15px; line-height: 1.5; }
-header { background: #fff; border-bottom: 1px solid #e6e6e9; }
-header > div { max-width: 824px; padding: 19px 32px; margin: auto; font-size: 19px; font-weight: 650; }
-main { width: 100%; max-width: 824px; padding: 32px; margin: auto; }
-.card { padding: 25px; margin-bottom: 22px; border-radius: 19px; background: #fff; }
-.status-card { display: flex; align-items: center; gap: 17px; }
-.card-icon { width: 38px; height: 38px; flex: 0 0 38px; stroke: #087cf0; stroke-width: 1.8; }
-.status-card.has-result .card-icon { stroke: #269851; }
-h1 { font-size: 18px; font-weight: 600; margin: 0 0 3px; }
-h2 { font-size: 22px; font-weight: 650; line-height: 1.3; margin: 0; letter-spacing: -.4px; }
-p { color: #74747c; margin: 8px 0 0; }
-.status-card p { font-size: 14px; margin: 0; }
-.empty-state { text-align: center; padding: 40px 25px; }
-.empty-state svg { width: 47px; height: 42px; stroke: #a0a0a8; stroke-width: 2; margin-bottom: 12px; }
-.empty-state h2 { font-size: 21px; }
-.empty-state p { font-size: 14px; margin-top: 6px; }
-.fields { margin: 20px 0 0; border-top: 1px solid #e9e9ed; }
-.field { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding-top: 15px; }
-dt { color: #707079; flex-shrink: 0; }
-dd { margin: 0; text-align: right; overflow-wrap: anywhere; min-width: 0; }
-#extra-fields { margin-top: 18px; font-size: 14px; }
-.technical { border-top: 1px solid #e9e9ed; margin-top: 22px; padding-top: 18px; }
-.technical h3 { font-size: 15px; font-weight: 600; margin: 0 0 13px; }
-.track-structure { padding: 10px 12px; background: #f5f6f8; border-radius: 8px; margin-top: 8px; }
-.track-structure p { font-size: 11px; margin: 0 0 5px; color: #727784; }
-.track-segments { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; }
-.track-piece { min-width: 0; max-width: 100%; padding: 6px 8px; border-radius: 5px; background: #e8eef7; }
-.track-piece code { display: block; font: 12px/1.8 ui-monospace, SFMono-Regular, Consolas, monospace; color: #315887; overflow-wrap: anywhere; white-space: pre-wrap; }
-.track-piece span { display: block; font-size: 9px; color: #64788e; margin-top: 2px; }
-.track-piece.marker { background: transparent; padding-left: 3px; padding-right: 3px; }
-.track-piece.marker code { color: #616874; }
-.technical-caption { font-size: 11px; line-height: 1.6; margin-top: 9px; }
-.checks { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 14px 0 0; }
-.checks .field { font-size: 12px; padding: 0; gap: 10px; }
-.checks dd { font-weight: 600; }
-.security-insight { border-left: 2px solid #91bdf0; padding-left: 11px; margin-top: 14px; font-size: 12px; color: #626b79; }
-.security-insight strong { color: #42516a; font-weight: 600; }
-.read-note { border-radius: 8px; background: #fff7e9; color: #906b30; padding: 11px 13px; font-size: 13px; margin-top: 18px; }
-.privacy-note { display: flex; align-items: flex-start; justify-content: center; gap: 7px; padding: 0 5px; font-size: 12px; color: #81818a; }
-.privacy-note svg { width: 16px; height: 18px; flex: 0 0 16px; stroke: currentColor; stroke-width: 1.2; }
+body { margin: 0; font-size: 14px; line-height: 1.5; }
+main { max-width: 1040px; padding: 40px 32px; margin: auto; }
+.status-card { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+h1 { font-size: 21px; letter-spacing: -.5px; font-weight: 600; margin: 0; }
+h2 { font-size: 16px; font-weight: 600; margin: 0; }
+p { margin: 0; }
+#reader-note { color: #777c84; font-size: 12px; margin-top: 5px; }
+#status { color: #65736b; font-size: 12px; text-align: right; }
+#status::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #658570; margin: 0 7px 1px 0; }
+.sheet { background: #fff; border: 1px solid #e0e2e5; border-radius: 9px; overflow: hidden; }
+.sheet-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 20px 25px 15px; }
+.sheet-heading > span { font-size: 11px; color: #858a92; }
+.empty-state { padding: 72px 24px; text-align: center; }
+.empty-state svg { width: 43px; height: 37px; stroke: #a2a7af; stroke-width: 1.7; margin-bottom: 13px; }
+.empty-state h2 { font-size: 20px; }
+.empty-state p { color: #848992; font-size: 13px; margin-top: 7px; }
+#track-structures { padding: 0 25px; }
+.track-structure { padding: 12px 0; }
+.track-structure + .track-structure { border-top: 1px solid #edf0f2; }
+.track-label { display: flex; justify-content: space-between; font-size: 11px; color: #7b818a; margin-bottom: 9px; }
+.track-label strong { font-weight: 550; color: #515963; }
+.track-stream { display: block; font: 14px/2 var(--mono); color: #858b93; white-space: pre-wrap; overflow-wrap: anywhere; }
+.track-stream span { padding: 3px 0; }
+.key-pan { --field-color: #715986; --field-bg: #eee7f4; }
+.key-name { --field-color: #486c90; --field-bg: #e6eff8; }
+.key-expiry { --field-color: #8a6a2e; --field-bg: #f6eedb; }
+.key-service { --field-color: #4a765e; --field-bg: #e7f1e9; }
+.key-discretionary { --field-color: #626b76; --field-bg: #edf0f3; }
+.track-stream .data { color: var(--field-color); background: var(--field-bg); }
+.markers { padding: 5px 25px 20px; font: 10px/1.8 var(--mono); color: #808791; }
+.markers > span { color: #515963; margin-right: 12px; }
+.markers b { font-weight: 400; margin: 0 7px; color: #b4b8bd; }
+table { border-collapse: collapse; table-layout: fixed; width: 100%; text-align: left; }
+thead { background: #fafafb; color: #858b94; font-size: 10px; }
+th { font-weight: 500; }
+th:first-child { width: 23%; }
+th:nth-child(2) { width: 34%; }
+th, td { padding: 12px 25px; border-top: 1px solid #e9ebee; overflow-wrap: anywhere; vertical-align: top; }
+tbody th { font-size: 12px; color: #525b66; }
+tbody th::before { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--field-color); border-radius: 1px; margin-right: 8px; vertical-align: 1px; }
+td { font-size: 12px; color: #7b828b; }
+td.encoded { font-family: var(--mono); color: #414a56; white-space: pre-wrap; }
+.checks-footer { padding: 14px 25px; border-top: 1px solid #e9ebee; display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; font-size: 10px; color: #959aa1; }
+.checks { display: flex; gap: 22px; flex-wrap: wrap; margin: 0; }
+.checks .field { display: flex; gap: 8px; }
+.checks dt { color: #818790; }
+.checks dd { margin: 0; color: #555f6c; font-weight: 550; }
+.read-note { margin: 0 25px 18px; padding: 10px 12px; background: #fcf5e9; color: #866630; border-left: 2px solid #d3b273; font-size: 12px; }
+.privacy-note { display: flex; justify-content: space-between; gap: 16px; padding-top: 15px; color: #959aa1; font-size: 11px; }
 [hidden] { display: none !important; }
-@media (max-width: 560px) {
-  header > div { padding: 16px 20px; font-size: 18px; }
-  main { padding: 20px 16px; }
-  .card { padding: 21px; border-radius: 16px; margin-bottom: 16px; }
-  .status-card { gap: 13px; }
-  .status-card p { font-size: 12px; }
-  h1 { font-size: 16px; }
-  h2 { font-size: 20px; }
-  .empty-state { padding: 35px 20px; }
-  .field { font-size: 14px; gap: 15px; }
-  .privacy-note { font-size: 11px; }
-  .checks { grid-template-columns: 1fr; gap: 8px; }
+@media (max-width: 640px) {
+  main { padding: 25px 16px; }
+  .status-card { align-items: flex-start; gap: 16px; }
+  h1 { font-size: 19px; }
+  #status { font-size: 10px; max-width: 130px; }
+  #reader-note { font-size: 11px; }
+  .sheet-heading { padding: 18px 16px 10px; }
+  #track-structures { padding: 0 16px; }
+  .track-stream { font-size: 12px; }
+  .markers { padding: 5px 16px 17px; font-size: 9px; }
+  th, td { padding: 10px 12px; font-size: 11px; }
+  th:first-child { width: 25%; }
+  th:nth-child(2) { width: 35%; }
+  tbody th::before { margin-right: 5px; width: 4px; height: 4px; }
+  .checks-footer { padding: 12px 16px; gap: 8px; }
+  .privacy-note { font-size: 10px; }
 }
 @media print { body { display: none; } }
