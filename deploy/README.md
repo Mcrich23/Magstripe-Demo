@@ -26,6 +26,16 @@ journalctl --user -u magstripe-kiosk.service -b
 
 `systemctl --user stop magstripe-kiosk.service` closes the kiosk until the next login. Alt+F4 alone will cause the service to restart Chromium. To stop automatic desktop launch, remove `~/.config/autostart/magstripe-kiosk.desktop`. To stop the server: `sudo systemctl disable --now magstripe-demo.service`.
 
-After a code update, run tests and then restart the server and kiosk services. A reboot verifies the complete boot → desktop login → local server → full-screen browser sequence. The 30-second swipe countdown still works as usual.
+## Update
+
+From the Pi desktop or SSH, run as the desktop user (without `sudo`):
+
+```sh
+~/Magstripe-Demo/scripts/update-kiosk.sh
+```
+
+The script pulls the current branch's upstream using fast-forward only, runs the tests and syntax checks with the installed Node runtime, and restarts the server and Chromium. It asks for sudo authentication when needed. Commit or stash local edits first. Changes must be pushed to the upstream repository before the Pi can pull them. If checks fail, the script stops before restarting; the pulled files remain in the checkout.
+
+A reboot verifies the complete boot → desktop login → local server → full-screen browser sequence. The 30-second swipe countdown still works as usual.
 
 References: [Raspberry Pi kiosk startup](https://www.raspberrypi.com/tutorials/how-to-use-a-raspberry-pi-in-kiosk-mode/) and [Chromium profile isolation](https://www.chromium.org/developers/creating-and-using-profiles/).
