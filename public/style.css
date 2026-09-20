@@ -60,7 +60,6 @@ td.encoded { font-family: var(--mono); color: #414a56; white-space: pre-wrap; }
 #clear-swipe { font: inherit; color: #525b66; background: #fff; border: 1px solid #d9dde2; border-radius: 5px; padding: 4px 9px; cursor: pointer; }
 #clear-swipe:hover { background: #edf0f3; }
 #clear-swipe:focus-visible { outline: 2px solid #486c90; outline-offset: 3px; }
-#clear-swipe kbd { font: inherit; color: #858a92; margin-left: 6px; }
 [hidden] { display: none !important; }
 @media (max-width: 640px) {
   main { padding: 25px 16px; }
