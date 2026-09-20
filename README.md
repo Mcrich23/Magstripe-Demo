@@ -16,13 +16,13 @@ You can also double-click `Start.command` on macOS or run `./scripts/start.sh` o
 
 ## Use
 
-- Connect a USB reader in **keyboard mode**, then keep the page active and swipe. Track format is detected automatically.
-- Results appear after 700 ms without input, allowing Enter/Tab between tracks. Wait for a result before the next swipe.
-- **Try a sample** uses fictional data. You can also paste into the reader input and click **Process**.
-- **More details** shows the service code and issuer-data length.
-- **Clear** or **Esc** clears the result. A new swipe replaces it. Results also clear after 60 seconds or when the window loses focus. Click the input to resume after leaving the window.
+Connect a USB reader in **keyboard mode** and leave this browser window active. Swipe a card; its information appears automatically. There are no buttons, input fields, menus, or manual processing steps.
 
-Configure the reader to send start/end markers (`%`, `;`, `?`), all available tracks, and no custom prefix or transmitted LRC. Match the OS keyboard layout to the reader, usually US English. The active indicator describes the page, not whether a USB device was detected.
+Each swipe replaces the previous result. Card number, cardholder, expiration, track format, service code, and issuer-data length appear together. Results clear after 60 seconds or when the window loses focus. Listening resumes automatically when the window becomes active again. The optional Esc shortcut clears immediately.
+
+Results appear after 700 ms without input, allowing Enter/Tab between tracks. Wait for a result before the next swipe. Configure the reader to send start/end markers (`%`, `;`, `?`), all available tracks, and no custom prefix or transmitted LRC. Match the OS keyboard layout to the reader, usually US English.
+
+A web page can receive reader keystrokes only while the browser page is active, not when the address bar or another application has focus. Keep it in the foreground at the booth; no field needs to be selected.
 
 ## Scope and privacy
 

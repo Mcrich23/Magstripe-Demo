@@ -14,28 +14,19 @@
   <main>
     <section class="card status-card" aria-label="Reader status">
       <svg class="card-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="3" y="6" width="26" height="20" rx="4"/><path d="M3 12h26M8 20h6"/></svg>
-      <div><h1 id="status" role="status" aria-live="polite">Ready for a swipe</h1><p>Connect your USB reader and keep this window open.</p></div>
+      <div><h1 id="status" role="status" aria-live="polite">Ready for a swipe</h1><p id="reader-note">Keep this window active. Swipes appear automatically.</p></div>
     </section>
 
-    <section class="card capture-card" aria-labelledby="capture-title">
-      <div class="section-header"><h2 id="capture-title">Swipe a card</h2><button id="sample-button" class="text-button">Try a sample</button></div>
-      <p>Swipe to see what’s on the stripe. The format is detected automatically.</p>
-      <label class="sr-only" for="reader-input">Magstripe reader input</label>
-      <input id="reader-input" type="password" placeholder="Waiting for reader input…" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="4096" aria-describedby="input-status" autofocus>
-      <div class="capture-footer"><span id="input-status" class="input-status"><span class="dot" aria-hidden="true"></span><span id="input-status-text">Reader input active</span></span><button id="process-button" class="primary-button" disabled>Process</button></div>
-    </section>
-
-    <section id="empty-state" class="card empty-state" aria-label="No card read">
+    <section id="empty-state" class="card empty-state" aria-label="Waiting for a swipe">
       <svg viewBox="0 0 48 40" fill="none" aria-hidden="true"><rect x="3" y="5" width="42" height="30" rx="5"/><path d="M3 15h42M10 27h9"/></svg>
-      <h2>No card read</h2><p>Swipe a card to see its information.</p>
+      <h2>Swipe a card</h2><p>That’s all. Your card’s information will appear here.</p>
     </section>
 
     <section id="result-card" class="card" aria-labelledby="result-title" hidden>
-      <div class="section-header"><h2 id="result-title">Last swipe</h2><button id="clear-button" class="text-button destructive">Clear</button></div>
-      <p id="sample-note" class="sample-note" hidden>Sample card · fictional details</p>
+      <h2 id="result-title">Last swipe</h2>
       <dl id="fields" class="fields"></dl>
       <p id="read-note" class="read-note" hidden></p>
-      <details id="more-details"><summary>More details</summary><dl id="extra-fields" class="fields"></dl><p class="detail-note">Service codes describe card usage rules. Issuer data is left uninterpreted.</p></details>
+      <dl id="extra-fields" class="fields extra-fields"></dl>
     </section>
 
     <p class="privacy-note"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="4" y="9" width="12" height="9" rx="2"/><path d="M6.5 9V6a3.5 3.5 0 0 1 7 0v3"/></svg><span>Card numbers are masked. Nothing is saved or sent. Swipes clear after 60 seconds.</span></p>
