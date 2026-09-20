@@ -70,7 +70,7 @@ function showResult(raw) {
       expiry: part ? `${part.value} · stored as year, then month` : 'Not available',
       service: 'Rules for where and how the card can be used',
       discretionary: `Extra data chosen by the card issuer${raw ? ` · ${raw.length} characters` : ''}`,
-      studentId: 'Seven-digit student ID · repeated on both tracks',
+      studentId: result.tracks.length === 1 ? 'Seven-digit student ID' : 'Seven-digit student ID · repeated on both tracks',
     };
     const row = document.createElement('tr'); row.className = `key-${key}`;
     const heading = document.createElement('th'); heading.scope = 'row'; heading.textContent = label;
@@ -91,7 +91,7 @@ function showTechnicalDetails() {
   const info = describeSwipe(result);
   $('checks').replaceChildren(); $('track-structures').replaceChildren();
   if (result.kind !== 'student') addField($('checks'), 'Number check (Luhn)', info.checksum);
-  addField($('checks'), result.kind === 'student' ? 'Same student ID on both tracks' : 'Same details on both tracks', info.agreement);
+  addField($('checks'), result.kind === 'student' ? 'Student ID across tracks' : 'Same details on both tracks', info.agreement);
   for (const track of info.tracks) {
     const row = document.createElement('div'); row.className = 'track-structure';
     const label = document.createElement('p'); label.className = 'track-label';

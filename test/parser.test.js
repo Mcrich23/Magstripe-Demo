@@ -61,7 +61,7 @@ test('student profile decodes the repeated ID at exact offsets', () => {
 });
 
 test('student detection is limited to the supplied layout and flags mismatches', () => {
-  for (const raw of ['%1234567?', ';123456742?', '%1234567?;123456742',
+  for (const raw of ['%1234567?', ';12345678?', ';1234567890?', ';1234567XX?', ';123456742', '%1234567?;123456742',
     '%123456?;12345642?', '%1234567?;1234567XX?', samples.student + samples.student]) {
     assert.equal(parseSwipe(raw).kind, 'unknown');
   }
@@ -69,4 +69,14 @@ test('student detection is limited to the supplied layout and flags mismatches',
   assert.equal(mismatch.kind, 'student');
   assert.ok(mismatch.warnings.some(w => w.includes('Student ID differs')));
   assert.equal(parseSwipe(samples.student + samples.payment).kind, 'payment');
+});
+
+test('single student Track 2 accepts different IDs and preserves leading zeros', () => {
+  for (const [id, tail] of [['1234567', '42'], ['7654321', '09'], ['0123456', '00']]) {
+    const r = parseSwipe(`;${id}${tail}?\r\n`);
+    assert.equal(r.kind, 'student'); assert.deepEqual(r.warnings, []);
+    assert.equal(r.tracks.length, 1); assert.equal(r.tracks[0].number, 2);
+    assert.equal(value(r, 'studentId'), id);
+    assert.equal(r.fields.length, 1);
+  }
 });

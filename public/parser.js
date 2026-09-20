@@ -74,6 +74,7 @@ function payment(result, track) {
 
 // Local profile inferred from the supplied university card, not a universal ID standard.
 function studentProfile(tracks) {
+  if (tracks.length === 1) return tracks[0].complete && /^;\d{9}\?$/.test(tracks[0].raw);
   return tracks.length === 2 && tracks.every(track => track.complete)
     && tracks.some(track => /^%\d{7}\?$/.test(track.raw))
     && tracks.some(track => /^;\d{9}\?$/.test(track.raw));
@@ -81,7 +82,7 @@ function studentProfile(tracks) {
 
 function student(result, track) {
   field(result, track, 'studentId', 'Student ID', track.raw.slice(1, 8), 1, 8,
-    'Seven-digit student ID, repeated on both tracks.', true, 'identity');
+    'Seven-digit student ID.', true, 'identity');
   track.decoded = true;
 }
 

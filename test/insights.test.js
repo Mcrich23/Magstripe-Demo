@@ -42,4 +42,9 @@ test('student explanation preserves the swipe without inventing separators or a 
   assert.equal(r.tracks.map(t => t.segments.map(s => s.text).join('')).join(''), samples.student);
   assert.equal(describe('%1234567?;765432142?').agreement, 'Mismatch');
   assert.equal(describe(';123456742?%1234567?').agreement, 'Match');
+  const single = describe(';765432109?');
+  assert.equal(single.agreement, 'Single track');
+  assert.equal(single.checksum, 'Not checked');
+  assert.deepEqual(single.tracks[0].segments.map(s => s.text), [';', '7654321', '09', '?']);
+  assert.deepEqual(single.tracks[0].segments[2], { text: '09', kind: 'literal' });
 });
