@@ -32,6 +32,10 @@ Card numbers stay masked; names, expiration dates, and issuer data are visible i
 
 Parsing happens entirely in browser memory. The local server only serves static files, binds to `127.0.0.1`, and accepts no swipe submissions. There is no storage, analytics, history, export, or external dependency. Clearing discards app state; it cannot erase OS memory, screenshots, extensions, or a clipboard used to paste input. This is an educational demo, not a payment-data vault.
 
+## Automatic kiosk startup
+
+See [Linux / Raspberry Pi kiosk setup](deploy/README.md) for a boot-time local server and full-screen Chromium that opens automatically with the desktop.
+
 ## Development
 
 ```sh
