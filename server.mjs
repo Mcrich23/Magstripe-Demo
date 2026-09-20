@@ -40,6 +40,6 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       console.error(error.code === 'EADDRINUSE' ? `Port ${port} is busy. Try PORT=4174 npm start.` : `Could not start local server (${error.code}).`);
       process.exitCode = 1;
     });
-    server.listen(port, '127.0.0.1', () => console.log(`\n  Magstripe Lab → http://127.0.0.1:${port}\n  Offline · Local only · Ctrl+C to stop\n`));
+    server.listen(port, '127.0.0.1', () => console.log(`\n  Magstripe Reader → http://127.0.0.1:${port}\n  Offline · Local only · Ctrl+C to stop\n`));
   }
 }

@@ -16,7 +16,7 @@ test('local static server serves only app assets and rejects writes', async t =>
     req.on('error', reject); req.end();
   });
   const index = await get('/');
-  assert.equal(index.status, 200); assert.match(index.body, /Magstripe Lab/);
+  assert.equal(index.status, 200); assert.match(index.body, /Magstripe Reader/);
   assert.equal(index.headers['cache-control'], 'no-store');
   assert.match(index.headers['content-security-policy'], /connect-src 'none'/);
   assert.match(index.headers['content-security-policy'], /form-action 'none'/);

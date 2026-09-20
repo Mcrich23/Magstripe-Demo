@@ -35,3 +35,15 @@ test('bounded capture fails without emitting the oversized payload', () => {
   c.push('%'); for (let i = 0; i < 4096; i++) c.push('1');
   flush(); assert.equal(errors.length, 1); assert.equal(swipes.length, 0); assert.equal(c.buffer, '');
 });
+test('pasted input can replace a partial swipe and process only once', () => {
+  const { capture: c, swipes, flush } = setup(); c.arm(); c.push('%');
+  c.replace(samples.payment); c.flush(); flush();
+  assert.deepEqual(swipes, [samples.payment]); assert.equal(c.buffer, '');
+  assert.equal(c.replace(''), true); flush(); assert.equal(swipes.length, 1);
+});
+test('pause rejects paste and overlong paste is discarded', () => {
+  const { capture: c, swipes, errors, flush } = setup();
+  assert.equal(c.replace(samples.payment), false); c.arm();
+  c.replace('x'.repeat(4097)); flush();
+  assert.equal(swipes.length, 0); assert.equal(errors.length, 1);
+});

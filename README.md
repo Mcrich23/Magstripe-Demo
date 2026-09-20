@@ -1,74 +1,42 @@
-# Magstripe Lab
+# Magstripe Reader
 
-A portable, offline demo that turns a USB card swipe into an interactive explanation of its magnetic tracks. Runs on **macOS and Ubuntu** with a local web interface. No npm dependencies, build step, account, cloud service, or database.
+A small, offline booth demo for a keyboard-style USB magstripe reader. Swipe a payment card to see its masked number, cardholder, expiration, and track format. Inspired by the simple layout of the companion SwiftUI app.
 
-## Run
+## Run on macOS or Ubuntu
 
-Install **Node.js 22 or newer**, then from this folder:
+Install **Node.js 22 or newer**, then run:
 
 ```sh
 npm start
 ```
 
-Open **http://127.0.0.1:4173** in a modern browser. Click **Start capture**, then swipe while the page is in front. Stop the server with Ctrl+C. `npm install` is not needed.
+Open **http://127.0.0.1:4173**. No `npm install`, build step, or internet connection is needed. Stop with Ctrl+C.
 
-- **macOS:** you can also double-click `Start.command` (or run it from Terminal).
-- **Ubuntu:** run `./scripts/start.sh`.
-- **Different port:** `PORT=4174 npm start`.
-- **Offline / portable:** copy this entire folder to the other computer, which needs Node installed. The app requires no internet connection to start or operate. All fonts, scripts, styles, and sample data are local. Do not open `index.html` directly; use the launcher/server for JavaScript modules.
+You can also double-click `Start.command` on macOS or run `./scripts/start.sh` on Ubuntu. If the port is busy, use `PORT=4174 npm start`. Copy this folder to another computer with Node installed to take the demo with you. Do not open `index.html` directly.
 
-The server binds only to `127.0.0.1`. There is intentionally no LAN or public deployment. No system services or global packages are installed by the launcher. The same Node code runs on both operating systems; see `docs/verification.md` for what was actually tested.
+## Use
 
-## At the demo table
+- Connect a USB reader in **keyboard mode**, then keep the page active and swipe. Track format is detected automatically.
+- Results appear after 700 ms without input, allowing Enter/Tab between tracks. Wait for a result before the next swipe.
+- **Try a sample** uses fictional data. You can also paste into the reader input and click **Process**.
+- **More details** shows the service code and issuer-data length.
+- **Clear** or **Esc** clears the result. A new swipe replaces it. Results also clear after 60 seconds or when the window loses focus. Click the input to resume after leaving the window.
 
-1. Connect a **keyboard-wedge USB magstripe reader** (a swipe types characters like a keyboard).
-2. Keep start/end sentinels enabled. Usually Track 1 begins with `%`, Track 2 with `;`, and each ends with `?`. Enable all available tracks and disable custom reader prefixes / transmitted LRC.
-3. Click **Start capture**. This arms the page; it does not claim a reader has been detected.
-4. Swipe one card. The app waits 700 ms after the last character to combine tracks, including readers that send Enter or Tab between them. A slower 1.5-second setting is available.
-5. Choose a track, select a colored segment, and explore its fields. Use **Reveal details** deliberately if you want to show personal information.
-6. **Clear** or **Esc** removes the current swipe before the next participant. A new swipe replaces the previous one and hides details again. Results automatically clear after one minute by default (configurable).
+Configure the reader to send start/end markers (`%`, `;`, `?`), all available tracks, and no custom prefix or transmitted LRC. Match the OS keyboard layout to the reader, usually US English. The active indicator describes the page, not whether a USB device was detected.
 
-Try the **Payment card** sample before using a real card. It contains fictional data. You can also paste text under **Input options → Paste a swipe instead**. Only use cards their owners have agreed to demonstrate.
+## Scope and privacy
 
-## What it explains
+Supports plain-text payment-card Tracks 1 and 2. State IDs, PDF417 barcodes, encrypted readers, chips and NFC are outside this demo’s scope. Incomplete, conflicting, or unfamiliar data is flagged. This does not authenticate cards or process payments. See [format details and sources](docs/formats.md).
 
-- **Payment cards:** PAN, cardholder name, expiration, service code, and the presence of issuer data; Tracks 1 and 2.
-- **Track structure:** markers, separators, field locations, and original text on explicit reveal.
-- **Read problems:** partial or duplicate tracks, conflicting payment fields, invalid dates, checksum failures, unrecognized formats, and barcode input.
+Card numbers stay masked; names and expiration dates are visible in the results. The app never shows the full raw stripe. Use cards whose owners have agreed to the demo, or use the fictional sample.
 
-See [format coverage and primary sources](docs/formats.md). State IDs and PDF417 barcodes are outside this demo’s scope. Encrypted USB HID, serial readers, and proprietary layouts need separate adapters. This app cannot authenticate cards, verify identity, read balances, process payments, or read chips/NFC.
-
-## Privacy behavior
-
-Parsing happens in browser memory. The server serves an explicit list of static assets and has no swipe endpoint. There is no analytics, logging of swipes, browser storage, export, history, or service worker. Its Content Security Policy blocks application network connections and form submissions. Responses are marked `no-store`.
-
-Personal fields and the original track are masked by default. Revealing displays sensitive data on screen. Losing window focus masks details, discards partial capture/paste input, and pauses listening; click Start capture to resume. Switching tabs clears results. Reloading, closing, timeout, or Clear also discards the app's references and removes rendered details. Print output is suppressed.
-
-This is a local educational demo, not a secure payment-data vault: masking does not encrypt JavaScript memory; browser extensions, developer tools, operating-system memory, screenshots, and the clipboard used for manual paste are outside its control. Clear removes app state, not forensic traces from the computer. Use the fictional samples for public presentations whenever possible.
-
-## Troubleshooting
-
-| Symptom | Check |
-| --- | --- |
-| Nothing happens | Start capture; keep the page active; use USB keyboard mode. The browser cannot detect the physical reader. |
-| Wrong punctuation | Match the OS keyboard layout to the reader (usually US English). Check Caps Lock and sentinel settings. |
-| Tracks appear separately | Use the slower reader option. Swipe one card at a time, allowing the result to appear. |
-| Incomplete track | Swipe again at a steady speed; clean the reader/card; enable end sentinels. |
-| Unsupported or encrypted input | Configure plaintext keyboard output if your reader supports it; encrypted devices cannot be decoded by this app. |
-| Port already in use | Run `PORT=4174 npm start`, then open that port. |
-| macOS double-click cannot find Node | Run `npm start` in a terminal where your Node version manager is initialized. |
+Parsing happens entirely in browser memory. The local server only serves static files, binds to `127.0.0.1`, and accepts no swipe submissions. There is no storage, analytics, history, export, or external dependency. Clearing discards app state; it cannot erase OS memory, screenshots, extensions, or a clipboard used to paste input. This is an educational demo, not a payment-data vault.
 
 ## Development
 
 ```sh
-npm test       # Node's built-in test runner; server tests bind an ephemeral loopback port
-npm run check # syntax checks
+npm test       # parser, capture, and loopback HTTP regression tests
+npm run check # JavaScript syntax checks
 ```
 
-- `public/parser.js`: pure parsing and annotated field ranges
-- `public/capture.js`: bounded keyboard-swipe accumulator
-- `public/app.js`: rendering and in-memory lifecycle
-- `server.mjs`: loopback-only static server
-- `test/`: parser, capture, and HTTP regression tests
-
-No real card data should be added to source, fixtures, issue reports, logs, or screenshots. Use synthetic values to reproduce a parsing issue.
+Source: `public/app.js` (UI), `public/parser.js` (decoder), `public/capture.js` (reader buffer), `server.mjs` (local server). See [verification notes](docs/verification.md) for checks and hardware limitations. Use synthetic values in tests and bug reports, never real card data.
