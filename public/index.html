@@ -18,19 +18,20 @@
 
     <section id="empty-state" class="sheet empty-state" aria-label="Waiting for a swipe">
       <svg viewBox="0 0 48 40" fill="none" aria-hidden="true"><rect x="3" y="5" width="42" height="30" rx="5"/><path d="M3 15h42M10 27h9"/></svg>
-      <h2>Swipe a card</h2><p>The track data and its breakdown will appear here.</p>
+      <h2>Swipe a card</h2><p>See the text on the stripe and what each part means.</p>
     </section>
 
     <section id="result-card" class="sheet" aria-labelledby="result-title" hidden>
-      <div class="sheet-heading"><h2 id="result-title">Track data</h2><span>Card number masked</span></div>
+      <div class="sheet-heading"><h2 id="result-title">What the reader sees</h2><span>• hides card-number digits</span></div>
+      <p class="reading-guide">Each track is a separate line of data on the stripe. Match the colors to the table below.</p>
       <div id="track-structures"></div>
-      <p class="markers"><span>Markers</span> % / ; start <b>·</b> B financial format <b>·</b> ^ / = separator <b>·</b> ? end</p>
+      <p class="markers"><span>Symbols</span> % or ; starts a track <b>·</b> B means payment-card format <b>·</b> ^ or = separates fields <b>·</b> ? ends the track</p>
       <p id="read-note" class="read-note" hidden></p>
       <table id="fields-table">
-        <thead><tr><th scope="col">Field</th><th scope="col">Encoded value</th><th scope="col">Meaning</th></tr></thead>
+        <thead><tr><th scope="col">Field</th><th scope="col">On the stripe</th><th scope="col">What it means</th></tr></thead>
         <tbody id="fields"></tbody>
       </table>
-      <footer class="checks-footer"><dl id="checks" class="checks"></dl><p>Consistency checks, not authentication.</p></footer>
+      <footer class="checks-footer"><dl id="checks" class="checks"></dl><p>These checks don’t prove the card is genuine.</p></footer>
     </section>
 
     <footer class="privacy-note"><span>Local only. Nothing saved.</span><span id="countdown">Swipes clear after 30 seconds.</span></footer>

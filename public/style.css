@@ -19,6 +19,7 @@ p { margin: 0; }
 .sheet { background: #fff; border: 1px solid #e0e2e5; border-radius: 9px; overflow: hidden; }
 .sheet-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 20px 25px 15px; }
 .sheet-heading > span { font-size: 11px; color: #858a92; }
+.reading-guide { padding: 0 25px 6px; font-size: 12px; color: #707985; }
 .empty-state { padding: 72px 24px; text-align: center; }
 .empty-state svg { width: 43px; height: 37px; stroke: #a2a7af; stroke-width: 1.7; margin-bottom: 13px; }
 .empty-state h2 { font-size: 20px; }
@@ -36,18 +37,18 @@ p { margin: 0; }
 .key-service { --field-color: #4a765e; --field-bg: #e7f1e9; }
 .key-discretionary { --field-color: #626b76; --field-bg: #edf0f3; }
 .track-stream .data { color: var(--field-color); background: var(--field-bg); }
-.markers { padding: 5px 25px 20px; font: 10px/1.8 var(--mono); color: #808791; }
+.markers { padding: 5px 25px 20px; font-size: 11px; line-height: 1.8; color: #707985; }
 .markers > span { color: #515963; margin-right: 12px; }
 .markers b { font-weight: 400; margin: 0 7px; color: #b4b8bd; }
 table { border-collapse: collapse; table-layout: fixed; width: 100%; text-align: left; }
-thead { background: #fafafb; color: #858b94; font-size: 10px; }
+thead { background: #fafafb; color: #707985; font-size: 11px; }
 th { font-weight: 500; }
 th:first-child { width: 23%; }
 th:nth-child(2) { width: 34%; }
 th, td { padding: 12px 25px; border-top: 1px solid #e9ebee; overflow-wrap: anywhere; vertical-align: top; }
 tbody th { font-size: 12px; color: #525b66; }
 tbody th::before { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--field-color); border-radius: 1px; margin-right: 8px; vertical-align: 1px; }
-td { font-size: 12px; color: #7b828b; }
+td { font-size: 12px; color: #66717d; }
 td.encoded { font-family: var(--mono); color: #414a56; white-space: pre-wrap; }
 .checks-footer { padding: 14px 25px; border-top: 1px solid #e9ebee; display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; font-size: 10px; color: #959aa1; }
 .checks { display: flex; gap: 22px; flex-wrap: wrap; margin: 0; }
@@ -64,9 +65,10 @@ td.encoded { font-family: var(--mono); color: #414a56; white-space: pre-wrap; }
   #status { font-size: 10px; max-width: 130px; }
   #reader-note { font-size: 11px; }
   .sheet-heading { padding: 18px 16px 10px; }
+  .reading-guide { padding: 0 16px 6px; font-size: 11px; }
   #track-structures { padding: 0 16px; }
   .track-stream { font-size: 12px; }
-  .markers { padding: 5px 16px 17px; font-size: 9px; }
+  .markers { padding: 5px 16px 17px; font-size: 10px; }
   th, td { padding: 10px 12px; font-size: 11px; }
   th:first-child { width: 25%; }
   th:nth-child(2) { width: 35%; }

@@ -55,11 +55,11 @@ function showResult(raw) {
     const raw = part ? track.raw.slice(part.start, part.end) : '';
     const encoded = key === 'pan' && raw ? mask(raw, true) : raw || '—';
     const meanings = {
-      pan: `Primary account number${raw ? ` · ${raw.length} digits` : ''}`,
-      name: formatName(raw),
-      expiry: part ? `${part.value} · YYMM` : 'Not available',
-      service: 'Usage and authorization rules',
-      discretionary: `Issuer-specific${raw ? ` · ${raw.length} characters` : ''}`,
+      pan: raw ? `${raw.length}-digit card number · only the last four shown` : 'Not available',
+      name: raw.trim() ? `${formatName(raw)} · stored last name first` : 'Not available',
+      expiry: part ? `${part.value} · stored as year, then month` : 'Not available',
+      service: 'Rules for where and how the card can be used',
+      discretionary: `Extra data chosen by the card issuer${raw ? ` · ${raw.length} characters` : ''}`,
     };
     const row = document.createElement('tr'); row.className = `key-${key}`;
     const heading = document.createElement('th'); heading.scope = 'row'; heading.textContent = label;
@@ -81,8 +81,8 @@ function showResult(raw) {
 function showTechnicalDetails() {
   const info = describeSwipe(result);
   $('checks').replaceChildren(); $('track-structures').replaceChildren();
-  addField($('checks'), 'Luhn checksum', info.checksum);
-  addField($('checks'), 'Shared fields', info.agreement);
+  addField($('checks'), 'Number check (Luhn)', info.checksum);
+  addField($('checks'), 'Same details on both tracks', info.agreement);
   for (const track of info.tracks) {
     const row = document.createElement('div'); row.className = 'track-structure';
     const label = document.createElement('p'); label.className = 'track-label';
