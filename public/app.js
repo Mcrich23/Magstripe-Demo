@@ -132,8 +132,8 @@ window.addEventListener('pageshow', resumeReader);
 function updateCountdown() {
   const seconds = result ? Math.max(0, Math.ceil((deadline - Date.now()) / 1000)) : CLEAR_AFTER_SECONDS;
   if (result && seconds === 0) { clearResult(); return; }
-  const text = result ? `Swipe clears in ${seconds} ${seconds === 1 ? 'second' : 'seconds'}.`
-    : `Swipes clear after ${CLEAR_AFTER_SECONDS} seconds.`;
+  const text = result ? `Swipe automatically clears in ${seconds} ${seconds === 1 ? 'second' : 'seconds'}.`
+    : `Swipe automatically clears after ${CLEAR_AFTER_SECONDS} seconds.`;
   if ($('countdown').textContent !== text) $('countdown').textContent = text;
 }
 setInterval(updateCountdown, 250);
