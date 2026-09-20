@@ -10,7 +10,12 @@ const capture = new SwipeCapture({
   onProgress: count => {
     // Discard the old card without resetting the new swipe's buffer.
     if (count && result) clearResult(false);
-    if (count) $('status').textContent = 'Reading card…';
+    if (count) {
+      $('status').textContent = 'Reading card…';
+      $('empty-state').hidden = true;
+      $('reading-state').hidden = false;
+      $('reading-progress').textContent = `${count} ${count === 1 ? 'character' : 'characters'} received. Waiting for the rest of the swipe…`;
+    }
   },
   onError: () => {
     clearResult();
@@ -25,6 +30,7 @@ function clearResult(resetCapture = true) {
   $('fields').replaceChildren();
   $('track-structures').replaceChildren(); $('checks').replaceChildren();
   $('read-note').textContent = ''; $('read-note').hidden = true;
+  $('reading-state').hidden = true; $('reading-progress').textContent = '';
   $('result-card').hidden = true; $('empty-state').hidden = false;
   document.querySelector('.status-card').classList.remove('has-result');
   $('status').textContent = capture.armed ? 'Ready for a swipe' : 'Waiting for this window';
@@ -42,6 +48,7 @@ function formatName(value) {
 }
 function showResult(raw) {
   capture.reset();
+  $('reading-state').hidden = true; $('reading-progress').textContent = '';
   result = parseSwipe(raw); deadline = Date.now() + CLEAR_AFTER_SECONDS * 1000;
   updateCountdown();
   $('fields').replaceChildren();

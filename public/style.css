@@ -24,6 +24,7 @@ p { margin: 0; }
 .empty-state svg { width: 43px; height: 37px; stroke: #a2a7af; stroke-width: 1.7; margin-bottom: 13px; }
 .empty-state h2 { font-size: 20px; }
 .empty-state p { color: #848992; font-size: 13px; margin-top: 7px; }
+.reading-indicator { display: block; width: 9px; height: 9px; margin: 12px auto 22px; background: #658570; border-radius: 50%; box-shadow: 0 0 0 6px #edf2ee; }
 #track-structures { padding: 0 25px; }
 .track-structure { padding: 12px 0; }
 .track-structure + .track-structure { border-top: 1px solid #edf0f2; }
