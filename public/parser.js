@@ -37,7 +37,7 @@ function tokenize(input, warnings) {
     const broken = nextStart >= 0 && (end < 0 || offset + 1 + nextStart < end);
     const stop = broken ? offset + 1 + nextStart : end < 0 ? text.length : end + 1;
     const raw = text.slice(offset, stop);
-    const number = raw[0] === ';' ? 2 : raw[0] === '%' && !/^%\d/.test(raw) ? 1 : 3;
+    const number = raw[0] === ';' ? 2 : raw[0] === '%' ? 1 : 3;
     tracks.push({ number, raw, complete: !broken && end >= 0, parts: [], decoded: false });
     offset = stop;
   }
@@ -72,6 +72,19 @@ function payment(result, track) {
   track.decoded = true;
 }
 
+// Local profile inferred from the supplied university card, not a universal ID standard.
+function studentProfile(tracks) {
+  return tracks.length === 2 && tracks.every(track => track.complete)
+    && tracks.some(track => /^%\d{7}\?$/.test(track.raw))
+    && tracks.some(track => /^;\d{9}\?$/.test(track.raw));
+}
+
+function student(result, track) {
+  field(result, track, 'studentId', 'Student ID', track.raw.slice(1, 8), 1, 8,
+    'Seven-digit student ID, repeated on both tracks.', true, 'identity');
+  track.decoded = true;
+}
+
 export function parseSwipe(input) {
   const result = { kind: 'unknown', title: 'Unrecognized swipe', tracks: [], fields: [], warnings: [] };
   if (typeof input !== 'string' || !input.trim()) { result.warnings.push('No swipe data received. Focus this page and try again.'); return result; }
@@ -79,10 +92,11 @@ export function parseSwipe(input) {
   if (/ANSI |AAMVA|^@\s*[\r\n]/.test(input)) { result.warnings.push('This looks like a PDF417 barcode, not a magnetic stripe. Barcode decoding is not supported in this demo.'); return result; }
   result.tracks = tokenize(input, result.warnings);
   const payEvidence = result.tracks.some(t => /^%B\d/.test(t.raw) || /^;\d{12,19}=\d{7}/.test(t.raw));
-  result.kind = payEvidence ? 'payment' : 'unknown';
+  result.kind = payEvidence ? 'payment' : studentProfile(result.tracks) ? 'student' : 'unknown';
   for (const track of result.tracks) {
     if (!track.complete) { result.warnings.push(`Track ${track.number} is incomplete (missing ? end marker). Try swiping again.`); continue; }
     if (result.kind === 'payment') payment(result, track);
+    if (result.kind === 'student') student(result, track);
     if (!track.decoded) result.warnings.push(`Track ${track.number} is present but its layout is unsupported. Its data is left uninterpreted.`);
   }
   const seen = new Set();
@@ -90,15 +104,15 @@ export function parseSwipe(input) {
     if (seen.has(t.number)) result.warnings.push(`More than one Track ${t.number} was received. Clear and swipe one card at a time.`);
     seen.add(t.number);
   }
-  for (const key of ['pan', 'expiry', 'service']) {
+  for (const key of ['pan', 'expiry', 'service', 'studentId']) {
     const values = result.fields.filter(f => f.key === key).map(f => f.value);
-    if (new Set(values).size > 1) result.warnings.push(`${key === 'pan' ? 'Card number' : key === 'expiry' ? 'Expiration' : 'Service code'} differs between tracks. Try a fresh swipe; these may be mixed or damaged reads.`);
+    if (new Set(values).size > 1) result.warnings.push(`${key === 'pan' ? 'Card number' : key === 'expiry' ? 'Expiration' : key === 'studentId' ? 'Student ID' : 'Service code'} differs between tracks. Try a fresh swipe; these may be mixed or damaged reads.`);
   }
   if (!result.fields.length) {
     result.kind = 'unknown';
     result.warnings.push('No supported fields found. Check that the reader sends plain-text tracks with start and end markers; encrypted and proprietary outputs cannot be decoded here.');
   }
-  result.title = result.kind === 'payment' ? 'Credit / debit card' : 'Unrecognized swipe';
+  result.title = result.kind === 'payment' ? 'Credit / debit card' : result.kind === 'student' ? 'Student ID' : 'Unrecognized swipe';
   result.warnings = [...new Set(result.warnings)];
   return result;
 }
@@ -117,7 +131,8 @@ export function describeSwipe(result) {
       return track.raw.slice(part.start, part.end);
     };
     const one = decoded.find(track => track.number === 1), two = decoded.find(track => track.number === 2);
-    agreement = ['pan', 'expiry', 'service'].every(key => values(one, key) === values(two, key)) ? 'Match' : 'Mismatch';
+    const keys = result.kind === 'student' ? ['studentId'] : ['pan', 'expiry', 'service'];
+    agreement = keys.every(key => values(one, key) === values(two, key)) ? 'Match' : 'Mismatch';
   }
   return {
     checksum,
@@ -133,7 +148,12 @@ export function describeSwipe(result) {
         if (key === 'pan') text = '•'.repeat(Math.max(0, raw.length - 4)) + raw.slice(-4);
         segments.push({ text, label: `${label} · ${raw.length}`, key, kind: 'field' });
       };
-      if (track.decoded) {
+      if (track.decoded && result.kind === 'student') {
+        marker(track.number === 1 ? '%' : ';', 'Start');
+        part('studentId', 'Student ID');
+        if (track.number === 2) segments.push({ text: track.raw.slice(8, 10), kind: 'literal' });
+        marker('?', 'End');
+      } else if (track.decoded) {
         marker(track.number === 1 ? '%' : ';', 'Start');
         if (track.number === 1) marker('B', 'Format');
         part('pan', 'Card number');

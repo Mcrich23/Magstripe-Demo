@@ -32,3 +32,14 @@ test('unsupported data stays hidden and long issuer data is shown exactly', () =
   const issuer = long.tracks[0].segments.find(s => s.label.startsWith('Issuer'));
   assert.equal(issuer.label, 'Issuer data · 100'); assert.equal(issuer.text, '1'.repeat(100));
 });
+
+test('student explanation preserves the swipe without inventing separators or a checksum', () => {
+  const r = describe(samples.student);
+  assert.equal(r.checksum, 'Not checked'); assert.equal(r.agreement, 'Match');
+  assert.deepEqual(r.tracks[0].segments.map(s => s.text), ['%', '1234567', '?']);
+  assert.deepEqual(r.tracks[1].segments.map(s => s.text), [';', '1234567', '42', '?']);
+  assert.deepEqual(r.tracks[1].segments[2], { text: '42', kind: 'literal' });
+  assert.equal(r.tracks.map(t => t.segments.map(s => s.text).join('')).join(''), samples.student);
+  assert.equal(describe('%1234567?;765432142?').agreement, 'Mismatch');
+  assert.equal(describe(';123456742?%1234567?').agreement, 'Match');
+});

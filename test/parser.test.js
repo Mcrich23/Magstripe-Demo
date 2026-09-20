@@ -45,3 +45,28 @@ test('non-payment ID data is not decoded as a payment card', () => {
   const r = parseSwipe('%CASAMPLE CITY^EXAMPLE$JAMIE^123 DEMO LANE^?');
   assert.equal(r.kind, 'unknown'); assert.equal(r.fields.length, 0);
 });
+
+test('student profile decodes the repeated ID at exact offsets', () => {
+  const r = parseSwipe(samples.student.replace('?;', '?\r\n;'));
+  assert.equal(r.kind, 'student'); assert.deepEqual(r.warnings, []);
+  assert.deepEqual(r.tracks.map(t => t.number), [1, 2]);
+  assert.equal(value(r, 'studentId'), '1234567');
+  assert.equal(value(r, 'suffix'), undefined);
+  assert.equal(value(r, 'pan'), undefined);
+  for (const t of r.tracks) for (const part of t.parts) {
+    assert.equal(t.raw.slice(part.start, part.end), part.value);
+  }
+  const zero = parseSwipe('%0123456?;012345600?');
+  assert.equal(value(zero, 'studentId'), '0123456');
+});
+
+test('student detection is limited to the supplied layout and flags mismatches', () => {
+  for (const raw of ['%1234567?', ';123456742?', '%1234567?;123456742',
+    '%123456?;12345642?', '%1234567?;1234567XX?', samples.student + samples.student]) {
+    assert.equal(parseSwipe(raw).kind, 'unknown');
+  }
+  const mismatch = parseSwipe('%1234567?;765432142?');
+  assert.equal(mismatch.kind, 'student');
+  assert.ok(mismatch.warnings.some(w => w.includes('Student ID differs')));
+  assert.equal(parseSwipe(samples.student + samples.payment).kind, 'payment');
+});

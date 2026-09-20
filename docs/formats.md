@@ -1,6 +1,6 @@
 # Supported formats
 
-This is an educational payment-card text decoder, not a card authenticator or payment application. A readable stripe and a passing Luhn checksum do not prove ownership, available funds, or validity. No network lookup is performed.
+This is an educational magstripe text decoder, not a card authenticator or payment application. A readable stripe and a passing Luhn checksum do not prove ownership, available funds, or validity. No network lookup is performed.
 
 ## Payment cards
 
@@ -8,8 +8,14 @@ Supports plaintext ISO/ABA Format B Track 1 and numeric Track 2, with start/end 
 
 Source: [MagTek tDynamo programmer manual, generic ISO/ABA data format, section 6](https://www.magtek.com/content/documentationfiles/d998200226.pdf). Reference checked September 20, 2026.
 
+## University student cards
+
+This local profile is based on the user-supplied swipe, not an external standard. It requires exactly two complete tracks: `%` followed by seven digits and `?`, and `;` followed by nine digits and `?`. For example, the **synthetic** swipe `%1234567?;123456742?` contains student ID `1234567` on both tracks and suffix `42` on Track 2. Leading zeros are preserved. The two ID values are compared, and mismatches are flagged. Partial, single-track, duplicate, or differently shaped student reads stay unrecognized rather than guessing their fields.
+
+Student tracks are displayed in full. Only the student ID is labeled; the trailing two digits remain plain, unlabeled track text without a table entry. No printed-card context is added, and no checksum or authentication claim is made. Payment-only markers and Luhn checks are omitted for student results. Clearing, focus loss, and the 30-second timeout discard student results just like payment results.
+
 ## Detection and limits
 
-Detection is a structural heuristic, not verification that the input is a genuine payment card. Duplicate or contradictory tracks are flagged; incomplete tracks are not decoded. An unsupported track does not prevent interpretation of other complete tracks. Unparsed data and full raw tracks are never displayed.
+Detection is a structural heuristic, not verification of card type, institution, or authenticity. Duplicate or contradictory tracks are flagged; incomplete tracks are not decoded. An unsupported track does not prevent interpretation of other complete tracks. Unparsed data stays hidden. Payment PANs stay masked; supported student tracks are displayed in full.
 
 Readers should send start/end sentinels, with no custom prefix or transmitted LRC. CR, LF, Tab, STX and ETX framing are accepted. Keyboard readers typically validate parity/LRC in hardware; this application receives text and cannot independently check the underlying magnetic encoding. Capture has a 4,096-character bound. It never decodes encrypted reader data. State IDs, PDF417 barcodes, chips and NFC are outside this demo’s scope.

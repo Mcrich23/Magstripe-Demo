@@ -99,4 +99,23 @@ test('hands-free lifecycle: successive swipes, focus recovery, and automatic cle
   assert.equal(node('result-card').hidden, true);
   doc.hidden = false; doc.dispatchEvent(new Event('visibilitychange'));
   type(';4111111111111111=2912101000?'); finish(); assert.equal(number(), '•••• 1111');
+  // Student cards use the same capture/clear flow, with their own field explanations.
+  type(samples.student.replace('?;', '?\n;') + '\n'); finish();
+  assert.equal(node('fields').children.length, 1);
+  assert.equal(number(), '1234567');
+  assert.equal(node('payment-markers').hidden, true);
+  assert.equal(node('checks').children.length, 1);
+  assert.equal(node('checks').children[0].children[1].textContent, 'Match');
+  assert.equal(node('countdown').textContent, 'Swipe automatically clears in 30 seconds.');
+  type('\n');
+  assert.equal(node('fields').children.length, 0);
+  assert.equal(node('track-structures').children.length, 0);
+  type(samples.student); finish();
+  now += 30_000; tick();
+  assert.equal(node('result-card').hidden, true);
+  type(samples.payment); finish();
+  assert.equal(node('fields').children.length, 5);
+  assert.equal(node('payment-markers').hidden, false);
+  assert.equal(node('checks').children.length, 2);
+  assert.equal(node('result-title').textContent, 'What the reader sees');
 });

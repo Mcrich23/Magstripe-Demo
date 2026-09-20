@@ -35,9 +35,10 @@ p { margin: 0; }
 .key-expiry { --field-color: #8a6a2e; --field-bg: #f6eedb; }
 .key-service { --field-color: #4a765e; --field-bg: #e7f1e9; }
 .key-discretionary { --field-color: #626b76; --field-bg: #edf0f3; }
+.key-studentId { --field-color: #486c90; --field-bg: #e6eff8; }
 .track-stream .data { color: var(--field-color); background: var(--field-bg); }
 .markers { padding: 5px 25px 20px; font-size: 11px; line-height: 1.8; color: #707985; }
-.markers > span { color: #515963; margin-right: 12px; }
+.markers > span:first-child { color: #515963; margin-right: 12px; }
 .markers b { font-weight: 400; margin: 0 7px; color: #b4b8bd; }
 table { border-collapse: collapse; table-layout: fixed; width: 100%; text-align: left; }
 thead { background: #fafafb; color: #707985; font-size: 11px; }
