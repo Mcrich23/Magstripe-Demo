@@ -56,6 +56,11 @@ td.encoded { font-family: var(--mono); color: #414a56; white-space: pre-wrap; }
 .checks dd { margin: 0; color: #555f6c; font-weight: 550; }
 .read-note { margin: 0 25px 18px; padding: 10px 12px; background: #fcf5e9; color: #866630; border-left: 2px solid #d3b273; font-size: 12px; }
 .privacy-note { display: flex; justify-content: space-between; gap: 16px; padding-top: 15px; color: #959aa1; font-size: 11px; }
+.clear-controls { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+#clear-swipe { font: inherit; color: #525b66; background: #fff; border: 1px solid #d9dde2; border-radius: 5px; padding: 4px 9px; cursor: pointer; }
+#clear-swipe:hover { background: #edf0f3; }
+#clear-swipe:focus-visible { outline: 2px solid #486c90; outline-offset: 3px; }
+#clear-swipe kbd { font: inherit; color: #858a92; margin-left: 6px; }
 [hidden] { display: none !important; }
 @media (max-width: 640px) {
   main { padding: 25px 16px; }

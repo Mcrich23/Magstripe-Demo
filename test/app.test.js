@@ -5,7 +5,7 @@ import { samples } from '../public/samples.js';
 // Exercise the actual UI controller with document lifecycle events and a clock.
 // Browser rendering and physical reader behavior are verified separately.
 test('hands-free lifecycle: successive swipes, focus recovery, and automatic clearing', async t => {
-  class Node {
+  class Node extends EventTarget {
     textContent = ''; hidden = false; children = [];
     classList = { remove() {}, toggle() {} };
     append(...nodes) { this.children.push(...nodes); }
@@ -46,6 +46,7 @@ test('hands-free lifecycle: successive swipes, focus recovery, and automatic cle
   assert.match(node('reading-progress').textContent, /^1 character received/);
   type(samples.payment.slice(1).replace('?;', '?\n;'));
   assert.match(node('reading-progress').textContent, /^87 characters received/);
+  type('\n'); // The reader's trailing Enter must not clear the incoming swipe.
   finish();
   assert.equal(node('reading-state').hidden, true);
   assert.equal(node('reading-progress').textContent, '');
@@ -57,6 +58,20 @@ test('hands-free lifecycle: successive swipes, focus recovery, and automatic cle
   assert.equal(stream.children.map(part => part.textContent).join(''), '%B••••••••••••4242^EXAMPLE/JAMIE^29121010000000000?');
   assert.equal(node('checks').children[0].children[1].textContent, 'Pass');
   assert.equal(node('checks').children[1].children[1].textContent, 'Match');
+  assert.equal(node('clear-swipe').hidden, false);
+  type('\n');
+  assert.equal(node('result-card').hidden, true);
+  assert.equal(node('empty-state').hidden, false);
+  assert.equal(node('clear-swipe').hidden, true);
+  assert.equal(node('fields').children.length, 0);
+  assert.equal(node('track-structures').children.length, 0);
+  assert.equal(node('countdown').textContent, 'Swipes clear after 30 seconds.');
+  type(samples.payment); finish();
+  node('clear-swipe').dispatchEvent(new Event('click'));
+  assert.equal(node('result-card').hidden, true);
+  assert.equal(node('clear-swipe').hidden, true);
+  assert.equal(node('fields').children.length, 0);
+  assert.equal(node('checks').children.length, 0);
   type(';4111111111111111=2912101000?'); finish();
   assert.equal(number(), '•••• 1111');
   type('%B4242'); doc.focused = false; win.dispatchEvent(new Event('blur')); finish();

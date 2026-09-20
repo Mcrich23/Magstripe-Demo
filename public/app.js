@@ -31,6 +31,7 @@ function clearResult(resetCapture = true) {
   $('read-note').textContent = ''; $('read-note').hidden = true;
   $('reading-state').hidden = true; $('reading-progress').textContent = '';
   $('result-card').hidden = true; $('empty-state').hidden = false;
+  $('clear-swipe').hidden = true;
   $('swipe-prompt').textContent = 'See the text on the stripe and what each part means.';
 }
 function addField(container, label, value) {
@@ -76,6 +77,7 @@ function showResult(raw) {
   $('read-note').hidden = !result.warnings.length;
   $('read-note').textContent = result.warnings.length ? result.warnings[0] : '';
   $('empty-state').hidden = true; $('result-card').hidden = false;
+  $('clear-swipe').hidden = false;
   $('reader-note').textContent = 'Ready for the next swipe.';
   showTechnicalDetails();
 }
@@ -112,12 +114,15 @@ function resumeReader() {
   if (!capture.armed) capture.arm();
   $('reader-note').textContent = result ? 'Ready for the next swipe.' : 'Keep this window active. Swipes appear automatically.';
 }
+$('clear-swipe').addEventListener('click', () => clearResult());
 document.addEventListener('keydown', event => {
   if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing || document.hidden) return;
   // A delivered key also resumes capture if focus events arrived out of order.
   if (!capture.armed) resumeReader();
   if (event.key === 'Escape') { event.preventDefault(); clearResult(); return; }
-  if (capture.push(event.key) || event.key === 'Enter' || event.key === 'Tab') event.preventDefault();
+  // Readers send Enter between or after tracks; only clear a finished result.
+  if (event.key === 'Enter' && result && !capture.buffer) { event.preventDefault(); clearResult(); return; }
+  if (capture.push(event.key) || event.key === 'Enter') event.preventDefault();
 }, true);
 window.addEventListener('blur', pauseReader);
 window.addEventListener('focus', resumeReader);
