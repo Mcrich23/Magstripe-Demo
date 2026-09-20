@@ -22,6 +22,6 @@ The member number, name, and additional data are shown in full. Each decoded tra
 
 ## Detection and limits
 
-Detection is a structural heuristic, not verification of card type, institution, or authenticity. Duplicate or contradictory tracks are flagged; incomplete tracks are not decoded. An unsupported track does not prevent interpretation of other complete tracks. Unparsed data stays hidden. Payment PANs stay masked; supported student and membership tracks are displayed in full.
+Detection is a structural heuristic, not verification of card type, institution, or authenticity. Duplicate or contradictory tracks are flagged; incomplete tracks are not decoded. An unsupported track does not prevent interpretation of other complete tracks. Unrecognized and incomplete tracks are shown as plain text with an Unrecognized layout label, without inferred fields. Decoded payment PANs stay masked; supported student and membership tracks are displayed in full.
 
 Readers should send start/end sentinels, with no custom prefix or transmitted LRC. CR, LF, Tab, STX and ETX framing are accepted. Keyboard readers typically validate parity/LRC in hardware; this application receives text and cannot independently check the underlying magnetic encoding. Capture has a 4,096-character bound. It never decodes encrypted reader data. State IDs, PDF417 barcodes, chips and NFC are outside this demo’s scope.

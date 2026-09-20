@@ -203,10 +203,12 @@ export function describeSwipe(result) {
         if (track.number === 1) { part('name', 'Name'); marker('^', 'Separator'); }
         part('expiry', 'Expiry'); part('service', 'Service'); part('discretionary', 'Issuer data');
         marker('?', 'End');
+      } else {
+        segments.push({ text: track.raw, kind: 'literal' });
       }
       return {
         number: track.number, characters: track.raw.length, segments,
-        note: track.decoded ? '' : track.complete ? 'Unrecognized layout · content hidden' : 'Incomplete track · content hidden',
+        note: track.decoded ? '' : track.complete ? 'Unrecognized layout' : 'Unrecognized layout · incomplete track',
       };
     }),
   };

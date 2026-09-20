@@ -18,7 +18,7 @@ test('membership Track 1 decodes numeric ID, name, and extra data without paymen
   assert.equal(parseSwipe('%12345^^?').kind, 'membership');
 });
 
-test('membership read survives missing Track 2 while incomplete Track 1 stays hidden', () => {
+test('membership read survives missing Track 2 while incomplete Track 1 stays undecoded', () => {
   const r = parseSwipe(samples.membership + ';');
   assert.equal(r.kind, 'membership'); assert.equal(r.tracks[0].decoded, true);
   assert.equal(r.tracks[1].decoded, false);

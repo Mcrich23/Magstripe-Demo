@@ -11,7 +11,8 @@ test('membership breakdown preserves its fields and omits invented payment marke
   assert.equal(r.tracks[0].segments.map(s => s.text).join(''), samples.membership);
   const partial = describe(samples.membership + ';');
   assert.equal(partial.agreement, 'Not checked');
-  assert.deepEqual(partial.tracks[1].segments, []);
+  assert.equal(partial.tracks[1].segments[0].kind, 'literal');
+  assert.match(partial.tracks[1].note, /incomplete track/);
   const both = describe(samples.membershipBoth);
   assert.equal(both.agreement, 'Match'); assert.equal(both.checksum, 'Not checked');
   assert.deepEqual(both.tracks[1].segments.map(s => s.text), [';', '7000000012345678', '=', '24127990000000000000', '?']);
@@ -37,13 +38,19 @@ test('checks distinguish failed checksum, contradictory fields, duplicate and pa
   assert.equal(describe(';4242424242424242=2912101000?').agreement, 'Single track');
   assert.equal(describe(samples.payment + samples.payment).agreement, 'Duplicate tracks');
   const partial = describe(samples.payment.slice(0, -1));
-  assert.equal(partial.agreement, 'Not checked'); assert.deepEqual(partial.tracks[1].segments, []);
+  assert.equal(partial.agreement, 'Not checked'); assert.equal(partial.tracks[1].segments[0].kind, 'literal');
+  assert.match(partial.tracks[1].note, /incomplete track/);
   assert.equal(describe('unrecognized').checksum, 'Not checked');
 });
-test('unsupported data stays hidden and long issuer data is shown exactly', () => {
+test('unrecognized data is shown literally and long issuer data is shown exactly', () => {
   const unknown = describe('%SECRET CARD DATA?');
-  assert.deepEqual(unknown.tracks[0].segments, []);
-  assert.ok(!JSON.stringify(unknown).includes('SECRET CARD DATA'));
+  assert.deepEqual(unknown.tracks[0].segments, [{ text: '%SECRET CARD DATA?', kind: 'literal' }]);
+  assert.equal(unknown.tracks[0].note, 'Unrecognized layout');
+  const partial = describe('%unfamiliar');
+  assert.deepEqual(partial.tracks[0].segments, [{ text: '%unfamiliar', kind: 'literal' }]);
+  const mixed = describe(samples.payment + '+EXAMPLE?');
+  assert.equal(mixed.tracks[2].segments[0].text, '+EXAMPLE?');
+  assert.equal(mixed.tracks[2].note, 'Unrecognized layout');
   const long = describe(';4242424242424242=2912101' + '1'.repeat(100) + '?');
   const issuer = long.tracks[0].segments.find(s => s.label.startsWith('Issuer'));
   assert.equal(issuer.label, 'Issuer data · 100'); assert.equal(issuer.text, '1'.repeat(100));
