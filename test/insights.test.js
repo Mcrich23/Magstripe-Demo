@@ -4,6 +4,16 @@ import { parseSwipe, describeSwipe } from '../public/parser.js';
 import { samples } from '../public/samples.js';
 const describe = raw => describeSwipe(parseSwipe(raw));
 
+test('membership breakdown preserves its fields and omits invented payment markers', () => {
+  const r = describe(samples.membership);
+  assert.equal(r.checksum, 'Not checked'); assert.equal(r.agreement, 'Single track');
+  assert.deepEqual(r.tracks[0].segments.map(s => s.text), ['%', '7000000012345678', '^', 'EXAMPLE/JAMIE', '^', '000000000000', '?']);
+  assert.equal(r.tracks[0].segments.map(s => s.text).join(''), samples.membership);
+  const partial = describe(samples.membership + ';');
+  assert.equal(partial.agreement, 'Not checked');
+  assert.deepEqual(partial.tracks[1].segments, []);
+});
+
 test('annotated tracks preserve encoded order while masking PAN and showing issuer values', () => {
   const r = describe(samples.payment.replaceAll('0000000000', '1234567890'));
   assert.equal(r.checksum, 'Pass'); assert.equal(r.agreement, 'Match');

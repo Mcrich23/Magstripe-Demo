@@ -4,6 +4,31 @@ import { parseSwipe, luhn, mask, MAX_INPUT } from '../public/parser.js';
 import { samples } from '../public/samples.js';
 const value = (r, key) => r.fields.find(f => f.key === key)?.value;
 
+test('membership Track 1 decodes numeric ID, name, and extra data without payment assumptions', () => {
+  const r = parseSwipe(samples.membership);
+  assert.equal(r.kind, 'membership'); assert.deepEqual(r.warnings, []);
+  assert.equal(value(r, 'memberId'), '7000000012345678');
+  assert.equal(value(r, 'name'), 'EXAMPLE/JAMIE');
+  assert.equal(value(r, 'extra'), '000000000000');
+  for (const key of ['pan', 'expiry', 'service']) assert.equal(value(r, key), undefined);
+  for (const part of r.tracks[0].parts) assert.equal(r.tracks[0].raw.slice(part.start, part.end), part.value);
+  const other = parseSwipe('%00123456^SAMPLE/CASEY^ABC123?');
+  assert.equal(value(other, 'memberId'), '00123456');
+  assert.equal(value(other, 'extra'), 'ABC123');
+  assert.equal(parseSwipe('%12345^^?').kind, 'membership');
+});
+
+test('membership read survives missing Track 2 while incomplete Track 1 stays hidden', () => {
+  const r = parseSwipe(samples.membership + ';');
+  assert.equal(r.kind, 'membership'); assert.equal(r.tracks[0].decoded, true);
+  assert.equal(r.tracks[1].decoded, false);
+  assert.ok(r.warnings.some(w => w.includes('Track 2 is incomplete')));
+  assert.ok(!r.warnings.some(w => /Luhn|expiration|Track 1/.test(w)));
+  assert.equal(parseSwipe(samples.membership.slice(0, -1)).kind, 'unknown');
+  assert.equal(parseSwipe('%abc^EXAMPLE/JAMIE^000?').kind, 'unknown');
+  assert.equal(parseSwipe(samples.membership + samples.payment).kind, 'payment');
+});
+
 test('payment tracks decode and annotate exact byte ranges', () => {
   const r = parseSwipe(samples.payment);
   assert.equal(r.kind, 'payment'); assert.equal(r.tracks.length, 2); assert.deepEqual(r.warnings, []);

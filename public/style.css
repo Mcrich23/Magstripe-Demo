@@ -36,6 +36,8 @@ p { margin: 0; }
 .key-service { --field-color: #4a765e; --field-bg: #e7f1e9; }
 .key-discretionary { --field-color: #626b76; --field-bg: #edf0f3; }
 .key-studentId { --field-color: #486c90; --field-bg: #e6eff8; }
+.key-memberId { --field-color: #715986; --field-bg: #eee7f4; }
+.key-extra { --field-color: #626b76; --field-bg: #edf0f3; }
 .track-stream .data { color: var(--field-color); background: var(--field-bg); }
 .markers { padding: 5px 25px 20px; font-size: 11px; line-height: 1.8; color: #707985; }
 .markers > span:first-child { color: #515963; margin-right: 12px; }

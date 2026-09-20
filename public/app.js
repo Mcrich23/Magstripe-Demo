@@ -52,10 +52,15 @@ function showResult(raw) {
   updateCountdown();
   $('fields').replaceChildren();
   const isStudent = result.kind === 'student';
-  $('result-title').textContent = isStudent ? 'Student ID · what the reader sees' : 'What the reader sees';
+  const isMember = result.kind === 'membership';
+  $('result-title').textContent = isStudent ? 'Student ID · what the reader sees' : isMember ? 'Membership card · what the reader sees' : 'What the reader sees';
   $('format-note').textContent = isStudent ? 'Matches the supplied student-card format' : '• hides card-number digits';
-  $('payment-markers').hidden = isStudent;
-  const definitions = isStudent ? [['studentId', 'Student ID']] : [
+  $('format-note').hidden = isMember;
+  $('payment-markers').hidden = isStudent || isMember;
+  $('membership-markers').hidden = !isMember;
+  const definitions = isStudent ? [['studentId', 'Student ID']] : isMember ? [
+    ['memberId', 'Member number'], ['name', 'Cardholder'], ['extra', 'Additional data'],
+  ] : [
     ['pan', 'Card number'], ['name', 'Cardholder'], ['expiry', 'Expiration'],
     ['service', 'Service code'], ['discretionary', 'Issuer data'],
   ];
@@ -71,6 +76,8 @@ function showResult(raw) {
       service: 'Rules for where and how the card can be used',
       discretionary: `Extra data chosen by the card issuer${raw ? ` · ${raw.length} characters` : ''}`,
       studentId: result.tracks.length === 1 ? 'Seven-digit student ID' : 'Seven-digit student ID · repeated on both tracks',
+      memberId: `${raw.length}-digit member number`,
+      extra: raw ? 'Card-specific data · shown as received' : 'No additional data',
     };
     const row = document.createElement('tr'); row.className = `key-${key}`;
     const heading = document.createElement('th'); heading.scope = 'row'; heading.textContent = label;
@@ -90,13 +97,13 @@ function showResult(raw) {
 function showTechnicalDetails() {
   const info = describeSwipe(result);
   $('checks').replaceChildren(); $('track-structures').replaceChildren();
-  if (result.kind !== 'student') addField($('checks'), 'Number check (Luhn)', info.checksum);
+  if (result.kind === 'payment') addField($('checks'), 'Number check (Luhn)', info.checksum);
   addField($('checks'), result.kind === 'student' ? 'Student ID across tracks' : 'Same details on both tracks', info.agreement);
   for (const track of info.tracks) {
     const row = document.createElement('div'); row.className = 'track-structure';
     const label = document.createElement('p'); label.className = 'track-label';
     const name = document.createElement('strong'); name.textContent = `Track ${track.number}`;
-    const length = document.createElement('span'); length.textContent = `${track.characters} characters`;
+    const length = document.createElement('span'); length.textContent = `${track.characters} ${track.characters === 1 ? 'character' : 'characters'}`;
     label.append(name, length);
     const layout = document.createElement('code'); layout.className = 'track-stream';
     for (const segment of track.segments) {

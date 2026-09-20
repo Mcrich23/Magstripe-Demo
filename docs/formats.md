@@ -14,8 +14,14 @@ This local profile is based on the user-supplied swipe, not an external standard
 
 Student tracks are displayed in full. Only the student ID is labeled; the trailing two digits remain plain, unlabeled track text without a table entry. No printed-card context is added, and no checksum or authentication claim is made. Payment-only markers and Luhn checks are omitted for student results. Clearing, focus loss, and the 30-second timeout discard student results just like payment results.
 
+## Membership-style cards
+
+Supports the user-supplied Costco-style Track 1 layout `%number^name^additional-data?`, without a `B` payment format marker. The numeric identifier may contain 1–32 digits; the name may contain up to 52 characters. Empty name and additional-data fields are accepted. This is a structural profile, not a lookup or verification of the issuer or membership status. Tests use fictional values such as `%7000000012345678^EXAMPLE/JAMIE^000000000000?`.
+
+The member number, name, and additional data are shown in full. The extra data is kept intact: zeros are not interpreted as an expiration date, service code, or checksum. Luhn is not applied. Payment-shaped tracks take precedence over this profile. A complete membership Track 1 is still decoded when a second track is missing or unsupported; a dangling `;` is shown as an incomplete Track 2, not an error in Track 1. Other proprietary membership layouts remain unsupported.
+
 ## Detection and limits
 
-Detection is a structural heuristic, not verification of card type, institution, or authenticity. Duplicate or contradictory tracks are flagged; incomplete tracks are not decoded. An unsupported track does not prevent interpretation of other complete tracks. Unparsed data stays hidden. Payment PANs stay masked; supported student tracks are displayed in full.
+Detection is a structural heuristic, not verification of card type, institution, or authenticity. Duplicate or contradictory tracks are flagged; incomplete tracks are not decoded. An unsupported track does not prevent interpretation of other complete tracks. Unparsed data stays hidden. Payment PANs stay masked; supported student and membership tracks are displayed in full.
 
 Readers should send start/end sentinels, with no custom prefix or transmitted LRC. CR, LF, Tab, STX and ETX framing are accepted. Keyboard readers typically validate parity/LRC in hardware; this application receives text and cannot independently check the underlying magnetic encoding. Capture has a 4,096-character bound. It never decodes encrypted reader data. State IDs, PDF417 barcodes, chips and NFC are outside this demo’s scope.

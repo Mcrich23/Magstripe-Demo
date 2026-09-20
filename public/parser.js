@@ -86,6 +86,26 @@ function student(result, track) {
   track.decoded = true;
 }
 
+// Membership-style layout supplied by the user; do not infer payment fields.
+function membershipMatch(raw) {
+  return /^%(\d{1,32})\^([^\^?]{0,52})\^([^\^?]*)\?$/.exec(raw);
+}
+
+function membership(result, track) {
+  const match = membershipMatch(track.raw);
+  if (!match) return;
+  const [, number, name, extra] = match;
+  field(result, track, 'memberId', 'Member number', number, 1, 1 + number.length,
+    'Numeric identifier on this membership-style card.', true, 'identity');
+  const nameStart = number.length + 2;
+  if (name.length) field(result, track, 'name', 'Cardholder', name.trim() || 'Not provided', nameStart, nameStart + name.length,
+    'Name text between the two field separators.', true, 'identity');
+  const extraStart = nameStart + name.length + 1;
+  if (extra.length) field(result, track, 'extra', 'Additional data', extra, extraStart, extraStart + extra.length,
+    'Card-specific data shown as received; no internal layout is inferred.', true);
+  track.decoded = true;
+}
+
 export function parseSwipe(input) {
   const result = { kind: 'unknown', title: 'Unrecognized swipe', tracks: [], fields: [], warnings: [] };
   if (typeof input !== 'string' || !input.trim()) { result.warnings.push('No swipe data received. Focus this page and try again.'); return result; }
@@ -93,11 +113,13 @@ export function parseSwipe(input) {
   if (/ANSI |AAMVA|^@\s*[\r\n]/.test(input)) { result.warnings.push('This looks like a PDF417 barcode, not a magnetic stripe. Barcode decoding is not supported in this demo.'); return result; }
   result.tracks = tokenize(input, result.warnings);
   const payEvidence = result.tracks.some(t => /^%B\d/.test(t.raw) || /^;\d{12,19}=\d{7}/.test(t.raw));
-  result.kind = payEvidence ? 'payment' : studentProfile(result.tracks) ? 'student' : 'unknown';
+  const memberEvidence = result.tracks.some(t => t.complete && membershipMatch(t.raw));
+  result.kind = payEvidence ? 'payment' : studentProfile(result.tracks) ? 'student' : memberEvidence ? 'membership' : 'unknown';
   for (const track of result.tracks) {
     if (!track.complete) { result.warnings.push(`Track ${track.number} is incomplete (missing ? end marker). Try swiping again.`); continue; }
     if (result.kind === 'payment') payment(result, track);
     if (result.kind === 'student') student(result, track);
+    if (result.kind === 'membership') membership(result, track);
     if (!track.decoded) result.warnings.push(`Track ${track.number} is present but its layout is unsupported. Its data is left uninterpreted.`);
   }
   const seen = new Set();
@@ -113,7 +135,7 @@ export function parseSwipe(input) {
     result.kind = 'unknown';
     result.warnings.push('No supported fields found. Check that the reader sends plain-text tracks with start and end markers; encrypted and proprietary outputs cannot be decoded here.');
   }
-  result.title = result.kind === 'payment' ? 'Credit / debit card' : result.kind === 'student' ? 'Student ID' : 'Unrecognized swipe';
+  result.title = result.kind === 'payment' ? 'Credit / debit card' : result.kind === 'student' ? 'Student ID' : result.kind === 'membership' ? 'Membership card' : 'Unrecognized swipe';
   result.warnings = [...new Set(result.warnings)];
   return result;
 }
@@ -153,6 +175,10 @@ export function describeSwipe(result) {
         marker(track.number === 1 ? '%' : ';', 'Start');
         part('studentId', 'Student ID');
         if (track.number === 2) segments.push({ text: track.raw.slice(8, 10), kind: 'literal' });
+        marker('?', 'End');
+      } else if (track.decoded && result.kind === 'membership') {
+        marker('%', 'Start'); part('memberId', 'Member number'); marker('^', 'Separator');
+        part('name', 'Name'); marker('^', 'Separator'); part('extra', 'Additional data');
         marker('?', 'End');
       } else if (track.decoded) {
         marker(track.number === 1 ? '%' : ';', 'Start');
