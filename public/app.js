@@ -11,7 +11,6 @@ const capture = new SwipeCapture({
     // Discard the old card without resetting the new swipe's buffer.
     if (count && result) clearResult(false);
     if (count) {
-      $('status').textContent = 'Reading card…';
       $('empty-state').hidden = true;
       $('reading-state').hidden = false;
       $('reading-progress').textContent = `${count} ${count === 1 ? 'character' : 'characters'} received. Waiting for the rest of the swipe…`;
@@ -19,7 +18,7 @@ const capture = new SwipeCapture({
   },
   onError: () => {
     clearResult();
-    $('status').textContent = 'Too much input — try one swipe';
+    $('swipe-prompt').textContent = 'Too much input — try one swipe';
   },
 });
 
@@ -32,8 +31,7 @@ function clearResult(resetCapture = true) {
   $('read-note').textContent = ''; $('read-note').hidden = true;
   $('reading-state').hidden = true; $('reading-progress').textContent = '';
   $('result-card').hidden = true; $('empty-state').hidden = false;
-  document.querySelector('.status-card').classList.remove('has-result');
-  $('status').textContent = capture.armed ? 'Ready for a swipe' : 'Waiting for this window';
+  $('swipe-prompt').textContent = 'See the text on the stripe and what each part means.';
 }
 function addField(container, label, value) {
   const row = document.createElement('div'); row.className = 'field';
@@ -78,9 +76,6 @@ function showResult(raw) {
   $('read-note').hidden = !result.warnings.length;
   $('read-note').textContent = result.warnings.length ? result.warnings[0] : '';
   $('empty-state').hidden = true; $('result-card').hidden = false;
-  document.querySelector('.status-card').classList.toggle('has-result', result.kind === 'payment');
-  $('status').textContent = result.kind === 'unknown' ? 'Swipe received — unrecognized format'
-    : result.warnings.length ? 'Swipe received — check the read' : 'Card read';
   $('reader-note').textContent = 'Ready for the next swipe.';
   showTechnicalDetails();
 }
@@ -115,7 +110,6 @@ function pauseReader() {
 function resumeReader() {
   if (document.hidden || !document.hasFocus()) return;
   if (!capture.armed) capture.arm();
-  if (!result && !capture.buffer) $('status').textContent = 'Ready for a swipe';
   $('reader-note').textContent = result ? 'Ready for the next swipe.' : 'Keep this window active. Swipes appear automatically.';
 }
 document.addEventListener('keydown', event => {

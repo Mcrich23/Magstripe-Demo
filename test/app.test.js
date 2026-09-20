@@ -39,11 +39,10 @@ test('hands-free lifecycle: successive swipes, focus recovery, and automatic cle
   };
   const finish = () => { for (const callback of [...pending.values()]) callback(); };
   const number = () => node('fields').children[0].children[1].textContent;
-  assert.equal(node('status').textContent, 'Ready for a swipe');
+  assert.equal(node('reader-note').textContent, 'Keep this window active. Swipes appear automatically.');
   type('%');
   assert.equal(node('reading-state').hidden, false);
   assert.equal(node('empty-state').hidden, true);
-  assert.equal(node('status').textContent, 'Reading card…');
   assert.match(node('reading-progress').textContent, /^1 character received/);
   type(samples.payment.slice(1).replace('?;', '?\n;'));
   assert.match(node('reading-progress').textContent, /^87 characters received/);
@@ -63,9 +62,9 @@ test('hands-free lifecycle: successive swipes, focus recovery, and automatic cle
   type('%B4242'); doc.focused = false; win.dispatchEvent(new Event('blur')); finish();
   assert.equal(node('result-card').hidden, true);
   assert.equal(node('reading-state').hidden, true);
-  assert.equal(node('status').textContent, 'Waiting for this window');
+  assert.equal(node('reader-note').textContent, 'Listening resumes when this window is active.');
   doc.focused = true; win.dispatchEvent(new Event('focus'));
-  assert.equal(node('status').textContent, 'Ready for a swipe');
+  assert.equal(node('reader-note').textContent, 'Keep this window active. Swipes appear automatically.');
   type(samples.payment); finish(); assert.equal(number(), '•••• 4242');
   assert.equal(node('countdown').textContent, 'Swipe clears in 30 seconds.');
   now += 1000; tick();

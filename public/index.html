@@ -13,17 +13,16 @@
   <main>
     <header class="status-card">
       <div><h1>Magstripe Reader</h1><p id="reader-note">Keep this window active. Swipes appear automatically.</p></div>
-      <p id="status" role="status" aria-live="polite">Ready for a swipe</p>
     </header>
 
     <section id="empty-state" class="sheet empty-state" aria-label="Waiting for a swipe">
       <svg viewBox="0 0 48 40" fill="none" aria-hidden="true"><rect x="3" y="5" width="42" height="30" rx="5"/><path d="M3 15h42M10 27h9"/></svg>
-      <h2>Swipe a card</h2><p>See the text on the stripe and what each part means.</p>
+      <h2>Swipe a card</h2><p id="swipe-prompt" role="status">See the text on the stripe and what each part means.</p>
     </section>
 
     <section id="reading-state" class="sheet empty-state" aria-labelledby="reading-title" hidden>
       <span class="reading-indicator" aria-hidden="true"></span>
-      <h2 id="reading-title">Reading card…</h2>
+      <h2 id="reading-title" aria-live="polite">Reading card…</h2>
       <p id="reading-progress"></p>
     </section>
 

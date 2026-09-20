@@ -9,13 +9,11 @@
 * { box-sizing: border-box; }
 body { margin: 0; font-size: 14px; line-height: 1.5; }
 main { max-width: 1040px; padding: 40px 32px; margin: auto; }
-.status-card { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+.status-card { margin-bottom: 26px; }
 h1 { font-size: 21px; letter-spacing: -.5px; font-weight: 600; margin: 0; }
 h2 { font-size: 16px; font-weight: 600; margin: 0; }
 p { margin: 0; }
 #reader-note { color: #777c84; font-size: 12px; margin-top: 5px; }
-#status { color: #65736b; font-size: 12px; text-align: right; }
-#status::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #658570; margin: 0 7px 1px 0; }
 .sheet { background: #fff; border: 1px solid #e0e2e5; border-radius: 9px; overflow: hidden; }
 .sheet-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 20px 25px 15px; }
 .sheet-heading > span { font-size: 11px; color: #858a92; }
@@ -61,9 +59,7 @@ td.encoded { font-family: var(--mono); color: #414a56; white-space: pre-wrap; }
 [hidden] { display: none !important; }
 @media (max-width: 640px) {
   main { padding: 25px 16px; }
-  .status-card { align-items: flex-start; gap: 16px; }
   h1 { font-size: 19px; }
-  #status { font-size: 10px; max-width: 130px; }
   #reader-note { font-size: 11px; }
   .sheet-heading { padding: 18px 16px 10px; }
   .reading-guide { padding: 0 16px 6px; font-size: 11px; }
