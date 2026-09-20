@@ -21,8 +21,9 @@ test('explicit arming; per-track Enter/Tab wait for entire swipe', () => {
 test('idle completes without terminator; subsequent swipes are independent', () => {
   const { capture: c, swipes, flush } = setup(); c.arm();
   [...samples.payment].forEach(k => c.push(k)); flush();
-  [...samples.id].forEach(k => c.push(k)); flush();
-  assert.deepEqual(swipes, [samples.payment, samples.id]);
+  const singleTrack = ';4111111111111111=2912101000?';
+  [...singleTrack].forEach(k => c.push(k)); flush();
+  assert.deepEqual(swipes, [samples.payment, singleTrack]);
 });
 test('stop/escape clear partial input and pending callback', () => {
   const { capture: c, swipes, flush } = setup(); c.arm();

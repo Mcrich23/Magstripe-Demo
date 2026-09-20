@@ -28,16 +28,15 @@ The server binds only to `127.0.0.1`. There is intentionally no LAN or public de
 5. Choose a track, select a colored segment, and explore its fields. Use **Reveal details** deliberately if you want to show personal information.
 6. **Clear** or **Esc** removes the current swipe before the next participant. A new swipe replaces the previous one and hides details again. Results automatically clear after one minute by default (configurable).
 
-Try the **Payment card** and **State ID** samples before using a real card. Both contain fictional data. You can also paste text under **Input options → Paste a swipe instead**. Only use cards their owners have agreed to demonstrate.
+Try the **Payment card** sample before using a real card. It contains fictional data. You can also paste text under **Input options → Paste a swipe instead**. Only use cards their owners have agreed to demonstrate.
 
 ## What it explains
 
 - **Payment cards:** PAN, cardholder name, expiration, service code, and the presence of issuer data; Tracks 1 and 2.
-- **Legacy AAMVA state IDs / driver licenses:** jurisdiction, city, name, address, encoded ID number, issuer number, expiration, birth date, and supported Track 3 attributes.
 - **Track structure:** markers, separators, field locations, and original text on explicit reveal.
 - **Read problems:** partial or duplicate tracks, conflicting payment fields, invalid dates, checksum failures, unrecognized formats, and barcode input.
 
-See [format coverage and primary sources](docs/formats.md). Not every state ID has a compatible stripe. A PDF417 barcode needs a barcode reader and is not supported. Encrypted USB HID, serial readers, and proprietary layouts need separate adapters. This app cannot authenticate cards, verify identity, read balances, process payments, or read chips/NFC.
+See [format coverage and primary sources](docs/formats.md). State IDs and PDF417 barcodes are outside this demo’s scope. Encrypted USB HID, serial readers, and proprietary layouts need separate adapters. This app cannot authenticate cards, verify identity, read balances, process payments, or read chips/NFC.
 
 ## Privacy behavior
 
@@ -55,7 +54,6 @@ This is a local educational demo, not a secure payment-data vault: masking does 
 | Wrong punctuation | Match the OS keyboard layout to the reader (usually US English). Check Caps Lock and sentinel settings. |
 | Tracks appear separately | Use the slower reader option. Swipe one card at a time, allowing the result to appear. |
 | Incomplete track | Swipe again at a steady speed; clean the reader/card; enable end sentinels. |
-| No ID details | Confirm the card has a magnetic stripe and the reader supports its tracks. Barcodes and proprietary state layouts need different support. |
 | Unsupported or encrypted input | Configure plaintext keyboard output if your reader supports it; encrypted devices cannot be decoded by this app. |
 | Port already in use | Run `PORT=4174 npm start`, then open that port. |
 | macOS double-click cannot find Node | Run `npm start` in a terminal where your Node version manager is initialized. |

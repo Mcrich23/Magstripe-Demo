@@ -50,9 +50,9 @@ function clearResult(notify = true, resetCapture = true) {
   renderCapture();
   if (notify) announce('Swipe cleared. Ready for the next participant.');
 }
-function showResult(raw, source, mode = $('format').value) {
+function showResult(raw, source) {
   capture.reset();
-  state.result = parseSwipe(raw, mode); state.revealed = false; state.selectedTrack = 0; state.source = source;
+  state.result = parseSwipe(raw); state.revealed = false; state.selectedTrack = 0; state.source = source;
   state.deadline = Date.now() + Number($('clear-after').value) * 1000;
   $('raw-details').open = false;
   $('empty-state').hidden = true; $('result-content').hidden = false; $('clear-button').disabled = false;
@@ -95,9 +95,7 @@ function renderResult() {
   });
   $('interpretation-text').textContent = r.kind === 'payment'
     ? 'A stripe carries account information, not a balance or transaction history. Reading these fields does not verify a card or authorize a payment. A Luhn check is only a number-format check.'
-    : r.kind === 'id'
-      ? 'This is a legacy AAMVA magnetic stripe. State layouts vary, and encoded numbers can differ from the printed ID. Reading these fields does not verify identity or authenticate the document.'
-      : 'Encrypted, proprietary, barcode, and incomplete data cannot always be interpreted. Check the reader setup and try a fresh swipe.';
+    : 'Encrypted, proprietary, barcode, and incomplete data cannot always be interpreted. Check the reader setup and try a fresh swipe.';
   renderTrack();
 }
 function selectTrack(index) {
@@ -108,7 +106,7 @@ function selectTrack(index) {
   $('raw-details').open = false; renderTrack();
 }
 function fieldValue(field) {
-  return field.sensitive && !state.revealed ? mask(field.value, field.key === 'pan' || field.key === 'id') : field.value;
+  return field.sensitive && !state.revealed ? mask(field.value, field.key === 'pan') : field.value;
 }
 function renderTrack() {
   const track = state.result?.tracks[state.selectedTrack];
@@ -169,15 +167,13 @@ $('capture-button').addEventListener('click', () => {
   if (capture.armed) { capture.stop(); hideDetails(); } else capture.arm();
   renderCapture(); announce(capture.armed ? 'Listening. Swipe a card now.' : 'Capture paused.');
 });
-$('sample-payment').addEventListener('click', () => { showResult(samples.payment, 'SAMPLE SWIPE', 'payment'); renderCapture(); });
-$('sample-id').addEventListener('click', () => { showResult(samples.id, 'SAMPLE SWIPE', 'id'); renderCapture(); });
+$('sample-payment').addEventListener('click', () => { showResult(samples.payment, 'SAMPLE SWIPE'); renderCapture(); });
 $('clear-button').addEventListener('click', () => clearResult());
 $('reveal-button').addEventListener('click', () => {
   if (!state.result) return;
   state.revealed = !state.revealed; renderResult();
   announce(state.revealed ? 'Personal details are now visible.' : 'Personal details hidden.');
 });
-$('format').addEventListener('change', () => { clearResult(false); announce('Format changed. Swipe again to decode in this format.'); });
 $('delay').addEventListener('change', () => { capture.reset(); capture.delay = Number($('delay').value); renderCapture(); });
 $('clear-after').addEventListener('change', () => {
   if (state.result) { state.deadline = Date.now() + Number($('clear-after').value) * 1000; updateCountdown(); }
